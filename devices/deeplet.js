@@ -164,9 +164,10 @@ deeplet.prototype.getHardwareInfo = function (input) {
 		"onDone": function (ret) {
 			LOG.warn("wrapper-HW-CB-dvr");
 			var normalizedHardwareInfo = {
-				"Model" : ret.Model,
-				"Serial" : ret.Serial,
-				"Version" : ret.SWVersion,
+				"Model": ret.Model,
+				"Serial": ret.Serial,
+				"Version": ret.SWVersion,
+				"Screens": ret.Screens,
 				// "rawdata" : ret // NumOfCameras, Audios, AIs, AOs, Encoders, Decoders
 			};
 			if (input.verbose == true) {
@@ -192,6 +193,7 @@ deeplet.prototype.getDeviceInformation = function (input) {
 			"Model" : ret.Model,
 			"Serial" : ret.Serial,
 			"Version" : ret.SWVersion,
+			"Screens": ret.Screens,
 		};
 		if (input.verbose == true) {
 			normalizedHardwareInfo.verbose = ret;
