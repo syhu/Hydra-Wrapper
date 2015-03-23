@@ -98,9 +98,9 @@ deeplet.prototype.setupConnector = function (input) {
 	}
 
 	// check connector path
-	if (typeof(global) === "undefined" || typeof(global.g_settings) === "undefined" || typeof(global.g_settings.libPath) === "undefined") {
+	if (typeof(global) === "undefined" || typeof(global.g_settings) === "undefined" || typeof(global.g_settings.path) === "undefined") {
 		// local testing
-		LOG.warn("global.g_settings.libPath undefined");
+		LOG.warn("global.g_settings.path undefined");
 		var connector = require("../../Hydra-Connector-DVR/dvr_connector_OO.js");
 
 	} else if (typeof(global) !== "undefined" && typeof(global.g_settings) !== "undefined" && typeof(global.g_settings.path) === "undefined") {
