@@ -45,6 +45,9 @@ function wrapper(input) {
 
 wrapper.prototype.setup = function (input) {
 	if (typeof(input) !== "undefined") {
+		if (typeof(input.type) !== "undefined") {
+			input.device_type = input.type;
+		}
 		switch (input.device_type) {
 		case "onvif":
 			var onvif = require("./devices/onvifc.js");
@@ -55,6 +58,15 @@ wrapper.prototype.setup = function (input) {
 			break;
 
 		case "deeplet":
+			LOG.warn("require deeplet wrapper");
+			var deeplet = require("./devices/deeplet.js");
+
+			this.prototype = this.__proto__;
+			this.__proto__ = new deeplet(input);
+			deeplet.call(this, input);
+			break;
+
+		case "dvr":
 			LOG.warn("require deeplet wrapper");
 			var deeplet = require("./devices/deeplet.js");
 

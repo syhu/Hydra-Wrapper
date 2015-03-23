@@ -99,10 +99,16 @@ deeplet.prototype.setupConnector = function (input) {
 
 	// check connector path
 	if (typeof(global) === "undefined" || typeof(global.g_settings) === "undefined" || typeof(global.g_settings.libPath) === "undefined") {
+		// local testing
 		LOG.warn("global.g_settings.libPath undefined");
 		var connector = require("../../Hydra-Connector-DVR/dvr_connector_OO.js");
+
+	} else if (typeof(global) !== "undefined" && typeof(global.g_settings) !== "undefined" && typeof(global.g_settings.path) === "undefined") {
+		// libPath undefined
+		var connector = require("../../connector/dvr_deeplet/dvr_connector_OO.js");
+
 	} else {
-		var connector = require(global.g_settings.libPath + "/connector/dvr_deeplet/dvr_connector_OO.js");
+		var connector = require(global.g_settings.path.base + "/connector/dvr_deeplet/dvr_connector_OO.js");
 	}
 
 	// create connector
