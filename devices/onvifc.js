@@ -8,6 +8,26 @@ init 要加入判斷帳號/密碼是否正確
 	
 */
 
+/* IC method */
+if (typeof(LOG) === "undefined") {
+	var LOG = {};
+	if (typeof(LOG.warn) === "undefined") {
+		LOG.warn = function (ret) {
+			console.warn(ret);
+		}
+	}
+	if (typeof(LOG.error) === "undefined") {
+		LOG.error = function (ret) {
+			console.error(ret);
+		}
+	}
+	if (typeof(LOG.stack) == "undefined") {
+		LOG.stack = function (ret) {
+			console.trace();
+		}
+	}
+}
+
 //var onDone;
 
 var sys = require('sys'); // http://nodejs.org/api.html#_child_processes
