@@ -24,20 +24,28 @@ onvifc.prototype.init = function (input) {
 	LOG.warn(this.data);
 	console.log("ovif init onError: ", (this.data.onError));
 	if (this.data.operation === "Probe") {
-		this.execute(this.data.operation, '', '', this.data.onDone, this.data.onError);
+		/*discovery.probe(function(_null, rinfo){
+                	input.onDone({
+                        	"IP" : rinfo.hostname,
+                        	"Port" : rinfo.port,
+                        	"Path" : rinfo.path
+                	});
+        	});*/
+
 		return;
 	}
 	//return;
-	LOG.warn('initiating: ip-' + this.data.ip 
+	LOG.warn('initiating: ip-' + this.data.host 
 		+ ' port-' + this.data.port 
-		+ ' username-' + this.data.username 
-		+ ' password-' + this.data.password + ' ');
+		+ ' username-' + this.data.user 
+		+ ' password-' + this.data.passwd + ' ');
 
 	// execute(obj.operation, obj.ip, argv4, obj.onDone, obj.onError);
 
 //	this.obj.debug = {};
 //    obj.onDone({status: this.obj});
-	input.onDone({status: this.data});
+	//input.onDone({status: this.data});
+	input.onDone(this);
 };
 
 
@@ -63,10 +71,10 @@ onvifc.prototype.getDeviceInformation = function(input){
 	var this_wrapper = this;
 	new Cam(
 		{
-			hostname: this_wrapper.data.host,
-			port: this_wrapper.data.port,
-			username: this_wrapper.data.usr,
-			password: this_wrapper.data.passwd
+			hostname: this.data.host,
+			port: this.data.port,
+			username: this.data.user,
+			password: this.data.passwd
 		},function(err){
 			this.getDeviceInformation(function(err, stream){
 				var Uri_stream;
@@ -78,7 +86,7 @@ onvifc.prototype.getDeviceInformation = function(input){
                                           	"Version" : stream.firmwareVersion,
                                           	"rtsp" : Uri_stream.uri
 					});
-				};
+				});
 			});
 		}
 	);
@@ -651,7 +659,7 @@ onvifc.prototype.execute = function (operation, ip, argv4, onDone, onError) {
 }
 
 //global.onvifc = onvifc;
-moudle.exports = onvifc;
+module.exports = onvifc;
 /*
 module.exports = {
 	onvifc: onvifc;
