@@ -13,6 +13,7 @@ init 要加入判斷帳號/密碼是否正確
 var sys = require('sys'); // http://nodejs.org/api.html#_child_processes
 var exec = require('child_process').exec;
 var Cam = require('onvif').Cam;
+var http = require('http');
 //~ var child;
 
 //var obj = {};
@@ -69,27 +70,46 @@ onvifc.prototype.status = function (input) {
 
 onvifc.prototype.getDeviceInformation = function(input){
 	var this_wrapper = this;
-	new Cam(
-		{
-			hostname: this.data.host,
-			port: this.data.port,
-			username: this.data.user,
-			password: this.data.passwd
-		},function(err){
-			this.getDeviceInformation(function(err, stream){
-				var Uri_stream;
-				this.getStreamUri(function(err, uri){
-					Uri_stream = uri;
-					input.onDone({
-						"Model" : stream.model,
-                                          	"Serial" : stream.serialNumber,
-                                          	"Version" : stream.firmwareVersion,
-                                          	"rtsp" : Uri_stream.uri
+	//for error ip input
+	var options = {
+		host: this_wrapper.data.host,
+		port: 80,
+		path: ''
+	};
+	//if http response, do get device info
+	http.get(options, function(res){
+		res.on('data', function(data){
+			new Cam(
+				{
+					hostname: this_wrapper.data.host,
+					port: this_wrapper.data.port,
+					username: this_wrapper.data.user,
+					password: this_wrapper.data.passwd
+				},function(err){
+					this.getDeviceInformation(function(err, stream){
+						var Uri_stream;
+		 				var cam_this = this;
+						cam_this.getStreamUri(function(err, uri){
+							Uri_stream = uri;
+							input.onDone({
+								"Model" : stream.model,
+								"Serial" : stream.serialNumber,
+								"Version" : stream.firmwareVersion,
+								"rtsp" : Uri_stream.uri
+							});
+						});
+
 					});
-				});
-			});
-		}
-	);
+				}
+			);
+		}).on('end', function(){
+			})
+		//if on error
+	}).on('error', function(){
+		input.onError({
+			"Error" : "check your IP!"	
+		});
+	});
 };
 
 // 傳回 ipcam 的硬體資訊 
