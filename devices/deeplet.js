@@ -336,6 +336,24 @@ deeplet.prototype.l_ctrlPTZ_hsp = function (targetA, targetB) {
 	}, 50);
 }
 
+deeplet.prototype.gogo_power_ranger = function (ptz_obj, hsp) {
+	var self = this;
+	this.tmpdata = {};
+	this.tmpdata.ptz_obj = ptz_obj;
+	this.tmpdata.hsp = hsp;
+
+	if (typeof(this.gogo_power) !== "undefined") {
+		return;
+	}
+	this.gogo_power = setInterval(function () {
+		console.log("go go power ranger");
+		console.log(self.tmpdata.ptz_obj.keyState);
+		self.tmpdata.ptz_obj.keyState = 1;
+		self.tmpdata.hsp.keyState = 1;
+		self.l_ctrlPTZ_hsp(self.tmpdata.ptz_obj, self.tmpdata.hsp);
+	}, 100);
+}
+
 deeplet.prototype.l_ctrlPTZ_raw = function (ptz_obj) {
 	var ptz_ctrl = this.dvr_connector.ptz(ptz_obj);
 }
@@ -410,7 +428,7 @@ deeplet.prototype.controlPTZ = function (input) {
 		*/
 		console.log(ptz_obj.keyState);
 		console.log("ptz_obj.keyState");
-		var gogo_power_ranger = setInterval(function () {
+		/*var gogo_power_ranger = setInterval(function () {
 			console.log("go go power ranger");
 			if (ptz_obj.keyState) {
 				self.l_ctrlPTZ_hsp(ptz_obj, up);
@@ -418,7 +436,12 @@ deeplet.prototype.controlPTZ = function (input) {
 				console.log(clearInterval);
 				clearInterval(gogo_power_ranger);
 			}
-		}, 100);
+		}, 200);*/
+		if (ptz_obj.keyState == 0) {
+			clearInterval(this.gogo_power);
+			break;
+		}
+		this.gogo_power_ranger(ptz_obj, up);
 		break;
 
 	case "right-down":
@@ -427,6 +450,7 @@ deeplet.prototype.controlPTZ = function (input) {
 		this.l_ctrlPTZ_raw(ptz_obj);
 		this.l_ctrlPTZ_raw(down);
 		*/
+		/*
 		var gogo_power_ranger = setInterval(function () {
 			console.log("go go power ranger");
 			if (ptz_obj.keyState) {
@@ -435,7 +459,13 @@ deeplet.prototype.controlPTZ = function (input) {
 				console.log(clearInterval);
 				clearInterval(gogo_power_ranger);
 			}
-		}, 100);
+		}, 200);
+		*/
+		if (ptz_obj.keyState == 0) {
+			clearInterval(this.gogo_power);
+			break;
+		}
+		this.gogo_power_ranger(ptz_obj, down);
 		break;
 
 	case "left-up":
@@ -444,15 +474,21 @@ deeplet.prototype.controlPTZ = function (input) {
 		this.l_ctrlPTZ_raw(ptz_obj);
 		this.l_ctrlPTZ_raw(up);
 		*/
-		var gogo_power_ranger = setInterval(function () {
+		/*var gogo_power_ranger = setInterval(function () {
 			console.log("go go power ranger");
-			if (ptz_obj.keyState) {
+			if (ptz_obj.keyState === 1) {
 				self.l_ctrlPTZ_hsp(ptz_obj, up);
 			} else {
 				console.log(clearInterval);
 				clearInterval(gogo_power_ranger);
 			}
-		}, 100);
+		}, 200);
+\		*/
+		if (ptz_obj.keyState == 0) {
+			clearInterval(this.gogo_power);
+			break;
+		}
+		this.gogo_power_ranger(ptz_obj, up);
 		break;
 
 	case "left-down":
@@ -461,6 +497,7 @@ deeplet.prototype.controlPTZ = function (input) {
 		this.l_ctrlPTZ_raw(ptz_obj);
 		this.l_ctrlPTZ_raw(down);
 		*/
+		/*
 		var gogo_power_ranger = setInterval(function () {
 			console.log("go go power ranger");
 			if (ptz_obj.keyState) {
@@ -469,7 +506,13 @@ deeplet.prototype.controlPTZ = function (input) {
 				console.log(clearInterval);
 				clearInterval(gogo_power_ranger);
 			}
-		}, 100);
+		}, 200);
+		*/
+		if (ptz_obj.keyState == 0) {
+			clearInterval(this.gogo_power);
+			break;
+		}
+		this.gogo_power_ranger(ptz_obj, down);
 		break;
 
 	case "zoomin":

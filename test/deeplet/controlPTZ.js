@@ -44,7 +44,7 @@ test = function (input) {
 				self.wrapper.controlPTZ(ptz_cmd);
 				clearInterval(ptz_ctrl);
 			}
-		}, 500);
+		}, 5000);
 	}
 
 	var setup = {
