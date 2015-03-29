@@ -33,6 +33,7 @@ if (typeof(LOG) === "undefined") {
 var sys = require('sys'); // http://nodejs.org/api.html#_child_processes
 var exec = require('child_process').exec;
 var Cam = require('onvif').Cam;
+var discovery = require('onvif').Discovery;
 var http = require('http');
 //~ var child;
 
@@ -53,14 +54,14 @@ onvifc.prototype.init = function (input) {
 	this.data.debug = {};
 //	LOG.warn(this.data);
 //	console.log("ovif init onError: ", (this.data.onError));
-	if (this.data.operation === "Probe") {
-		/*discovery.probe(function(_null, rinfo){
+	if (this.data.device_type === "onvifAutoscan") {
+		discovery.probe(function(_null, rinfo){
                 	input.onDone({
                         	"IP" : rinfo.hostname,
                         	"Port" : rinfo.port,
                         	"Path" : rinfo.path
                 	});
-        	});*/
+        	});
 
 		return this;
 	}
@@ -77,6 +78,20 @@ onvifc.prototype.init = function (input) {
 	// input.onDone({status: this.data});
 	input.onDone(this.__proto__);
 	return this;
+};
+
+onvifc.prototype.autoScan = function(input){
+	discovery.probe(function(_null, rinfo){
+		rinfo.forEach(function(cam){
+               		input.onDone({
+                       		"IP" : cam.hostname,
+                    	   	"Port" : cam.port,
+                       		"Path" : cam.path
+               		});
+		});
+//		console.log(rinfo);
+        });
+	
 };
 
 //顯示目前所有 ipcam 狀態
