@@ -439,6 +439,7 @@ deeplet.prototype.controlPTZ = function (input) {
 		}, 200);*/
 		if (ptz_obj.keyState == 0) {
 			clearInterval(this.gogo_power);
+			ptz_obj.onDone("byebye ptz");
 			break;
 		}
 		ptz_obj.onDone("go go power ranger");
@@ -465,6 +466,7 @@ deeplet.prototype.controlPTZ = function (input) {
 		*/
 		if (ptz_obj.keyState == 0) {
 			clearInterval(this.gogo_power);
+			ptz_obj.onDone("byebye ptz");
 			break;
 		}
 		ptz_obj.onDone("go go power ranger");
@@ -490,6 +492,7 @@ deeplet.prototype.controlPTZ = function (input) {
 \		*/
 		if (ptz_obj.keyState == 0) {
 			clearInterval(this.gogo_power);
+			ptz_obj.onDone("byebye ptz");
 			break;
 		}
 		ptz_obj.onDone("go go power ranger");
@@ -516,6 +519,7 @@ deeplet.prototype.controlPTZ = function (input) {
 		*/
 		if (ptz_obj.keyState == 0) {
 			clearInterval(this.gogo_power);
+			ptz_obj.onDone("byebye ptz");
 			break;
 		}
 		ptz_obj.onDone("go go power ranger");
