@@ -293,7 +293,7 @@ var l_ctrlPTZ = function (ptz_obj) {
 			this.dvr_connector.ptz(ptz_obj);
 			clearInterval(ptz_ctrl);
 		}
-	}, 200);
+	}, 500);
 }
 
 /*
@@ -301,6 +301,10 @@ var l_ctrlPTZ_raw = function (ptz_obj) {
 	var ptz_ctrl = this.dvr_connector.ptz(ptz_obj);
 }
 */
+
+deeplet.prototype.l_ctrlPTZ_raw = function (ptz_obj) {
+	var ptz_ctrl = this.dvr_connector.ptz(ptz_obj);
+}
 
 deeplet.prototype.controlPTZ = function (input) {
 	var self = this;
@@ -319,9 +323,11 @@ deeplet.prototype.controlPTZ = function (input) {
 	var onError = function (response) {
 	};
 
+/*
 	var l_ctrlPTZ_raw = function (ptz_obj) {
 		var ptz_ctrl = self.dvr_connector.ptz(ptz_obj);
 	}
+*/
 
 	var up = {
 		"keyState": input.keyState,
@@ -344,135 +350,135 @@ deeplet.prototype.controlPTZ = function (input) {
 	switch (input.Operation) {
 	case "up":
 		ptz_obj.keyCode = 0;
-		l_ctrlPTZ_raw(ptz_obj);
+		this.l_ctrlPTZ_raw(ptz_obj);
 		break;
 
 	case "down":
 		ptz_obj.keyCode = 1;
-		l_ctrlPTZ_raw(ptz_obj);
+		this.l_ctrlPTZ_raw(ptz_obj);
 		break;
 
 	case "left":
 		ptz_obj.keyCode = 2;
-		l_ctrlPTZ_raw(ptz_obj);
+		this.l_ctrlPTZ_raw(ptz_obj);
 		break;
 
 	case "right":
 		ptz_obj.keyCode = 3;
-		l_ctrlPTZ_raw(ptz_obj);
+		this.l_ctrlPTZ_raw(ptz_obj);
 		break;
 
 	case "right-up":
 		ptz_obj.keyCode = 3;
-		l_ctrlPTZ_raw(ptz_obj);
-		l_ctrlPTZ_raw(up);
+		this.l_ctrlPTZ_raw(ptz_obj);
+		this.l_ctrlPTZ_raw(up);
 		break;
 
 	case "right-down":
 		ptz_obj.keyCode = 3;
-		l_ctrlPTZ_raw(ptz_obj);
-		l_ctrlPTZ_raw(down);
+		this.l_ctrlPTZ_raw(ptz_obj);
+		this.l_ctrlPTZ_raw(down);
 		break;
 
 	case "left-up":
 		ptz_obj.keyCode = 2;
-		l_ctrlPTZ_raw(ptz_obj);
-		l_ctrlPTZ_raw(up);
+		this.l_ctrlPTZ_raw(ptz_obj);
+		this.l_ctrlPTZ_raw(up);
 		break;
 
 	case "left-down":
 		ptz_obj.keyCode = 2;
-		l_ctrlPTZ_raw(ptz_obj);
-		l_ctrlPTZ_raw(down);
+		this.l_ctrlPTZ_raw(ptz_obj);
+		this.l_ctrlPTZ_raw(down);
 		break;
 
 	case "zoomin":
 		ptz_obj.keyCode = 4;
-		l_ctrlPTZ_raw(ptz_obj);
+		this.l_ctrlPTZ_raw(ptz_obj);
 		break;
 
 	case "zoomout":
 		ptz_obj.keyCode = 5;
-		l_ctrlPTZ_raw(ptz_obj);
+		this.l_ctrlPTZ_raw(ptz_obj);
 		break;
 
 	case "focus+":
 		ptz_obj.keyCode = 6;
-		l_ctrlPTZ_raw(ptz_obj);
+		this.l_ctrlPTZ_raw(ptz_obj);
 		break;
 
 	case "focus-":
 		ptz_obj.keyCode = 7;
-		l_ctrlPTZ_raw(ptz_obj);
+		this.l_ctrlPTZ_raw(ptz_obj);
 		break;
 
 	case "focusauto":
 		ptz_obj.keyCode = 8;
 		ptz_obj.keyState = 1;
-		l_ctrlPTZ_raw(ptz_obj);
+		this.l_ctrlPTZ_raw(ptz_obj);
 		break;
 
 	case "iris+":
 		ptz_obj.keyCode = 9;
-		l_ctrlPTZ_raw(ptz_obj);
+		this.l_ctrlPTZ_raw(ptz_obj);
 		break;
 
 	case "iris-":
 		ptz_obj.keyCode = 10;
-		l_ctrlPTZ_raw(ptz_obj);
+		this.l_ctrlPTZ_raw(ptz_obj);
 		break;
 
 	case "irisauto":
 		ptz_obj.keyCode = 11;
 		ptz_obj.keyState = 1;
-		l_ctrlPTZ_raw(ptz_obj);
+		this.l_ctrlPTZ_raw(ptz_obj);
 		break;
 
 	case "gotopreset":
 		ptz_obj.keyCode = 12;
 		ptz_obj.keyState = 1;
 		ptz_obj.param = input.param;
-		l_ctrlPTZ_raw(ptz_obj);
+		this.l_ctrlPTZ_raw(ptz_obj);
 		break;
 
 	case "setpreset":
 		ptz_obj.keyCode = 13;
 		ptz_obj.keyState = 1;
 		ptz_obj.param = input.param;
-		l_ctrlPTZ_raw(ptz_obj);
+		this.l_ctrlPTZ_raw(ptz_obj);
 		break;
 
 	case "seq":
 		ptz_obj.keyCode = 19;
 		ptz_obj.keyState = 1;
 		ptz_obj.param = input.param;
-		l_ctrlPTZ_raw(ptz_obj);
+		this.l_ctrlPTZ_raw(ptz_obj);
 		break;
 
 	case "seqon":
 		ptz_obj.keyCode = 20;
 		ptz_obj.keyState = 1;
 		ptz_obj.param = input.param;
-		l_ctrlPTZ_raw(ptz_obj);
+		this.l_ctrlPTZ_raw(ptz_obj);
 		break;
 
 	case "seqoff":
 		ptz_obj.keyCode = 21;
 		ptz_obj.keyState = 1;
 		ptz_obj.param = input.param;
-		l_ctrlPTZ_raw(ptz_obj);
+		this.l_ctrlPTZ_raw(ptz_obj);
 		break;
 
 	case "speed+":
 		ptz_obj.keyCode = 22;
 		ptz_obj.param = input.param;
-		l_ctrlPTZ_raw(ptz_obj);
+		this.l_ctrlPTZ_raw(ptz_obj);
 		break;
 
 	case "speed-":
 		ptz_obj.keyCode = 23;
 		ptz_obj.param = input.param;
-		l_ctrlPTZ_raw(ptz_obj);
+		this.l_ctrlPTZ_raw(ptz_obj);
 		break;
 
 	default:
