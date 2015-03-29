@@ -319,7 +319,7 @@ deeplet.prototype.l_ctrlPTZ_hsp = function (targetA, targetB) {
 				clearInterval(b);
 				console.log("clear b");
 			}
-		}, 50);
+		}, 60);
 	}
 
 	console.log("awake a");
@@ -333,7 +333,7 @@ deeplet.prototype.l_ctrlPTZ_hsp = function (targetA, targetB) {
 			console.log("clear a");
 			awake_b();
 		}
-	}, 50);
+	}, 60);
 }
 
 deeplet.prototype.gogo_power_ranger = function (ptz_obj, hsp) {
@@ -351,7 +351,7 @@ deeplet.prototype.gogo_power_ranger = function (ptz_obj, hsp) {
 		self.tmpdata.ptz_obj.keyState = 1;
 		self.tmpdata.hsp.keyState = 1;
 		self.l_ctrlPTZ_hsp(self.tmpdata.ptz_obj, self.tmpdata.hsp);
-	}, 100);
+	}, 150);
 }
 
 deeplet.prototype.l_ctrlPTZ_raw = function (ptz_obj) {
@@ -441,6 +441,8 @@ deeplet.prototype.controlPTZ = function (input) {
 			clearInterval(this.gogo_power);
 			break;
 		}
+		ptz_obj.onDone("go go power ranger");
+		ptz_obj.onDone = onDone;
 		this.gogo_power_ranger(ptz_obj, up);
 		break;
 
@@ -465,6 +467,8 @@ deeplet.prototype.controlPTZ = function (input) {
 			clearInterval(this.gogo_power);
 			break;
 		}
+		ptz_obj.onDone("go go power ranger");
+		ptz_obj.onDone = onDone;
 		this.gogo_power_ranger(ptz_obj, down);
 		break;
 
@@ -488,6 +492,8 @@ deeplet.prototype.controlPTZ = function (input) {
 			clearInterval(this.gogo_power);
 			break;
 		}
+		ptz_obj.onDone("go go power ranger");
+		ptz_obj.onDone = onDone;
 		this.gogo_power_ranger(ptz_obj, up);
 		break;
 
@@ -512,6 +518,8 @@ deeplet.prototype.controlPTZ = function (input) {
 			clearInterval(this.gogo_power);
 			break;
 		}
+		ptz_obj.onDone("go go power ranger");
+		ptz_obj.onDone = onDone;
 		this.gogo_power_ranger(ptz_obj, down);
 		break;
 
