@@ -86,6 +86,10 @@ onvifc.prototype.status = function (input) {
 	input.onDone({status:this.data}); 
 };
 
+onvifc.prototype.exit = function(input){
+	input.onDone("GG");
+}
+
 onvifc.prototype.getDeviceInformation = function(input){
 	var this_wrapper = this;
 	//for error ip input
