@@ -296,11 +296,14 @@ var l_ctrlPTZ = function (ptz_obj) {
 	}, 200);
 }
 
+/*
 var l_ctrlPTZ_raw = function (ptz_obj) {
 	var ptz_ctrl = this.dvr_connector.ptz(ptz_obj);
 }
+*/
 
 deeplet.prototype.controlPTZ = function (input) {
+	var self = this;
 	var ptz_obj = {
 		"keyState": input.keyState,
 		"keyCode": 0,
@@ -309,6 +312,10 @@ deeplet.prototype.controlPTZ = function (input) {
 		"onDone": input.onDone,
 		"onError": input.onError
 	};
+
+	var l_ctrlPTZ_raw = function (ptz_obj) {
+		var ptz_ctrl = self.dvr_connector.ptz(ptz_obj);
+	}
 
 	switch (input.Operation) {
 	case "up":
