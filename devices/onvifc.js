@@ -128,7 +128,7 @@ onvifc.prototype.getDeviceInformation = function(input){
 					this.getDeviceInformation(function(err, stream){
 						var Uri_stream;
 		 				var cam_this = this;
-						cam_this.getStreamUri(function(err, uri){
+						cam_this.getStreamUri({profileToken:'Stream_1'},function(err, uri){
 							Uri_stream = uri;
 							input.onDone({
 								"Model" : stream.model,
