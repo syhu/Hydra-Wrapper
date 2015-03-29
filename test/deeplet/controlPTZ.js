@@ -31,11 +31,21 @@ test = function (input) {
 		"ch": 0,
 		"param": 0,
 		"keyState": 1,
-		"onDone": function (response) {
-			self.wrapper.controlPTZ(ptz_stop)
-		},
+		"onDone": onDone,
 		"onError": onError
 	};
+
+	var l_ctrlPTZ = function (ptz_cmd) {
+		var ptz_ctrl = setInterval (function () {
+			if (ptz_cmd.keyState) {
+				self.wrapper.controlPTZ(ptz_cmd);
+				ptz_cmd.keyState = 0;
+			} else {
+				self.wrapper.controlPTZ(ptz_cmd);
+				clearInterval(ptz_ctrl);
+			}
+		}, 500);
+	}
 
 	var setup = {
 		"onDone": onDone,
@@ -49,7 +59,8 @@ test = function (input) {
 	};
 
 	setup.onDone = function (response) {
-		self.wrapper.controlPTZ(ptz);
+		l_ctrlPTZ(ptz);
+//		self.wrapper.controlPTZ(ptz);
 	};
 
 	var wrapper = require("../../wrapper.js");

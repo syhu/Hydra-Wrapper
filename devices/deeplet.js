@@ -284,7 +284,8 @@ deeplet.prototype.exit = function (input) {
 	this.dvr_connector.exit(input);
 }
 
-var l_ctrlPTZ = function (ptz_obj) {
+/*
+deeplet.prototype.l_ctrlPTZ = function (ptz_obj) {
 	var ptz_ctrl = setInterval (function () {
 		if (ptz_obj.keyState) {
 			this.dvr_connector.ptz(ptz_obj);
@@ -293,14 +294,47 @@ var l_ctrlPTZ = function (ptz_obj) {
 			this.dvr_connector.ptz(ptz_obj);
 			clearInterval(ptz_ctrl);
 		}
-	}, 500);
+	}, 200);
 }
+*/
 
 /*
 var l_ctrlPTZ_raw = function (ptz_obj) {
 	var ptz_ctrl = this.dvr_connector.ptz(ptz_obj);
 }
 */
+
+// HSIAO SUI PU
+deeplet.prototype.l_ctrlPTZ_hsp = function (targetA, targetB) {
+	var self = this;
+
+	var awake_b = function () {
+		console.log("awake b");
+		var b = setInterval (function () {
+			if (targetB.keyState) {
+				self.dvr_connector.ptz(targetB);
+				targetB.keyState = 0;
+			} else {
+				self.dvr_connector.ptz(targetB);
+				clearInterval(b);
+				console.log("clear b");
+			}
+		}, 50);
+	}
+
+	console.log("awake a");
+	var a = setInterval (function () {
+		if (targetA.keyState) {
+			self.dvr_connector.ptz(targetA);
+			targetA.keyState = 0;
+		} else {
+			self.dvr_connector.ptz(targetA);
+			clearInterval(a);
+			console.log("clear a");
+			awake_b();
+		}
+	}, 50);
+}
 
 deeplet.prototype.l_ctrlPTZ_raw = function (ptz_obj) {
 	var ptz_ctrl = this.dvr_connector.ptz(ptz_obj);
@@ -370,26 +404,72 @@ deeplet.prototype.controlPTZ = function (input) {
 
 	case "right-up":
 		ptz_obj.keyCode = 3;
+		/*
 		this.l_ctrlPTZ_raw(ptz_obj);
 		this.l_ctrlPTZ_raw(up);
+		*/
+		console.log(ptz_obj.keyState);
+		console.log("ptz_obj.keyState");
+		var gogo_power_ranger = setInterval(function () {
+			console.log("go go power ranger");
+			if (ptz_obj.keyState) {
+				self.l_ctrlPTZ_hsp(ptz_obj, up);
+			} else {
+				console.log(clearInterval);
+				clearInterval(gogo_power_ranger);
+			}
+		}, 100);
 		break;
 
 	case "right-down":
 		ptz_obj.keyCode = 3;
+		/*
 		this.l_ctrlPTZ_raw(ptz_obj);
 		this.l_ctrlPTZ_raw(down);
+		*/
+		var gogo_power_ranger = setInterval(function () {
+			console.log("go go power ranger");
+			if (ptz_obj.keyState) {
+				self.l_ctrlPTZ_hsp(ptz_obj, down);
+			} else {
+				console.log(clearInterval);
+				clearInterval(gogo_power_ranger);
+			}
+		}, 100);
 		break;
 
 	case "left-up":
 		ptz_obj.keyCode = 2;
+		/*
 		this.l_ctrlPTZ_raw(ptz_obj);
 		this.l_ctrlPTZ_raw(up);
+		*/
+		var gogo_power_ranger = setInterval(function () {
+			console.log("go go power ranger");
+			if (ptz_obj.keyState) {
+				self.l_ctrlPTZ_hsp(ptz_obj, up);
+			} else {
+				console.log(clearInterval);
+				clearInterval(gogo_power_ranger);
+			}
+		}, 100);
 		break;
 
 	case "left-down":
 		ptz_obj.keyCode = 2;
+		/*
 		this.l_ctrlPTZ_raw(ptz_obj);
 		this.l_ctrlPTZ_raw(down);
+		*/
+		var gogo_power_ranger = setInterval(function () {
+			console.log("go go power ranger");
+			if (ptz_obj.keyState) {
+				self.l_ctrlPTZ_hsp(ptz_obj, down);
+			} else {
+				console.log(clearInterval);
+				clearInterval(gogo_power_ranger);
+			}
+		}, 100);
 		break;
 
 	case "zoomin":
