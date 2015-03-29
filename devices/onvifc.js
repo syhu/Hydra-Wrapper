@@ -38,12 +38,21 @@ var http = require('http');
 
 //var obj = {};
 
+function onvifc(input) {
+	// the constructor
+	if (typeof(input) !== "undefined") {
+		this.data = input;
+		this.init(input);
+	}
+	return this;
+}
+
 //~ var INIT = function (obj) {
 onvifc.prototype.init = function (input) {
 	this.data = input;
 	this.data.debug = {};
-	LOG.warn(this.data);
-	console.log("ovif init onError: ", (this.data.onError));
+//	LOG.warn(this.data);
+//	console.log("ovif init onError: ", (this.data.onError));
 	if (this.data.operation === "Probe") {
 		/*discovery.probe(function(_null, rinfo){
                 	input.onDone({
@@ -53,7 +62,7 @@ onvifc.prototype.init = function (input) {
                 	});
         	});*/
 
-		return;
+		return this;
 	}
 	//return;
 	LOG.warn('initiating: ip-' + this.data.host 
@@ -64,22 +73,11 @@ onvifc.prototype.init = function (input) {
 	// execute(obj.operation, obj.ip, argv4, obj.onDone, obj.onError);
 
 //	this.obj.debug = {};
-//    obj.onDone({status: this.obj});
-	//input.onDone({status: this.data});
-	input.onDone(this);
+//	obj.onDone({status: this.obj});
+	// input.onDone({status: this.data});
+	input.onDone(this.__proto__);
+	return this;
 };
-
-
-function onvifc (input) {
-	// the constructor
-	
-	if (input) {
-		this.data = input; // 不曉得為什麼要加這一行
-		this.init(input);
-	}
-	
-}
-
 
 //顯示目前所有 ipcam 狀態
 onvifc.prototype.status = function (input) { 

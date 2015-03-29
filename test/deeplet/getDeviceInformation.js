@@ -2,6 +2,7 @@ var fs = require("fs");
 var demosite = JSON.parse(fs.readFileSync("../../../Hydra-Connector-DVR/test/demosite.json", "utf8"));
 
 test = function (input) {
+	var self = this;
 	var onDone = function (response) {
 		console.log("onDone");
 		if (typeof(response) !== "undefined")
@@ -32,11 +33,15 @@ test = function (input) {
 		"passwd": demosite.passwd
 	};
 
+	setup.onDone = function (response) {
+		self.wrapper.getDeviceInformation(getDevInfo);
+	};
+
 	var wrapper = require("../../wrapper.js");
 	this.wrapper = new wrapper();
 	this.wrapper.setup(setup);
 
-	while (typeof(this.wrapper.getDeviceInformation) === "undefined") {
+/*	while (typeof(this.wrapper.getDeviceInformation) === "undefined") {
 		if (typeof(this.wrapper.getDeviceInformation) !== "undefined") {
 			console.log("getDeviceInformation");
 			this.wrapper.getDeviceInformation(getDevInfo);
@@ -44,5 +49,6 @@ test = function (input) {
 	}
 //	console.log(this.wrapper.__proto__);
 	this.wrapper.getDeviceInformation(getDevInfo);
+*/
 }
 test();

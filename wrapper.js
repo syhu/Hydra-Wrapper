@@ -53,8 +53,11 @@ wrapper.prototype.setup = function (input) {
 			var onvif = require("./devices/onvifc.js");
 
 			this.prototype = this.__proto__;
-			this.__proto__ = new onvif(input);
+			this.__proto__ = new onvif();
+			console.log("this.__proto__");
+			console.log(this.__proto__);
 			onvif.call(this, input);
+			this.init(input);
 			break;
 
 		case "deeplet":
@@ -62,8 +65,9 @@ wrapper.prototype.setup = function (input) {
 			var deeplet = require("./devices/deeplet.js");
 
 			this.prototype = this.__proto__;
-			this.__proto__ = new deeplet(input);
+			this.__proto__ = new deeplet();
 			deeplet.call(this, input);
+			this.setupConnector(input);
 			break;
 
 		case "dvr":
@@ -71,8 +75,9 @@ wrapper.prototype.setup = function (input) {
 			var deeplet = require("./devices/deeplet.js");
 
 			this.prototype = this.__proto__;
-			this.__proto__ = new deeplet(input);
+			this.__proto__ = new deeplet();
 			deeplet.call(this, input);
+			this.setupConnector(input);
 			break;
 
 		default:
