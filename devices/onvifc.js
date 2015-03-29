@@ -82,14 +82,16 @@ onvifc.prototype.init = function (input) {
 
 onvifc.prototype.autoScan = function(input){
 	discovery.probe(function(_null, rinfo){
+		var cams = [];
 		rinfo.forEach(function(cam){
-               		input.onDone({
+			cams.push({
                        		"IP" : cam.hostname,
                     	   	"Port" : cam.port,
                        		"Path" : cam.path
-               		});
+			});
 		});
-//		console.log(rinfo);
+		input.onDone(cams);
+		console.log(cams);
         });
 	
 };
