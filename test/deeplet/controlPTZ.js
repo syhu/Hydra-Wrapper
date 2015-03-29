@@ -18,7 +18,7 @@ test = function (input) {
 	};
 
 	var ptz_stop = {
-		"Operation": "left",
+		"Operation": "right-up",
 		"ch": 0,
 		"param": 0,
 		"keyState": 0,
@@ -27,7 +27,7 @@ test = function (input) {
 	};
 
 	var ptz = {
-		"Operation": "left",
+		"Operation": "right-up",
 		"ch": 0,
 		"param": 0,
 		"keyState": 1,

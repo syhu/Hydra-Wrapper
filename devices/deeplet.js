@@ -313,9 +313,33 @@ deeplet.prototype.controlPTZ = function (input) {
 		"onError": input.onError
 	};
 
+	var onDone = function (response) {
+	};
+
+	var onError = function (response) {
+	};
+
 	var l_ctrlPTZ_raw = function (ptz_obj) {
 		var ptz_ctrl = self.dvr_connector.ptz(ptz_obj);
 	}
+
+	var up = {
+		"keyState": input.keyState,
+		"keyCode": 0,
+		"ch": input.ch,
+		"param": 0,
+		"onDone": onDone,
+		"onError": onError
+	};
+
+	var down = {
+		"keyState": input.keyState,
+		"keyCode": 1,
+		"ch": input.ch,
+		"param": 0,
+		"onDone": onDone,
+		"onError": onError
+	};
 
 	switch (input.Operation) {
 	case "up":
@@ -340,46 +364,26 @@ deeplet.prototype.controlPTZ = function (input) {
 
 	case "right-up":
 		ptz_obj.keyCode = 3;
-		ptz_obj.onDone = function (ack) {
-			ptz_obj.keyState = 1;
-			ptz_obj.keyCode = 0;
-			ptz_obj.onDone = input.onDone;
-			l_ctrlPTZ_raw(ptz_obj);
-		}
 		l_ctrlPTZ_raw(ptz_obj);
+		l_ctrlPTZ_raw(up);
 		break;
 
 	case "right-down":
 		ptz_obj.keyCode = 3;
-		ptz_obj.onDone = function (ack) {
-			ptz_obj.keyState = 1;
-			ptz_obj.keyCode = 1;
-			ptz_obj.onDone = input.onDone;
-			l_ctrlPTZ_raw(ptz_obj);
-		}
 		l_ctrlPTZ_raw(ptz_obj);
+		l_ctrlPTZ_raw(down);
 		break;
 
 	case "left-up":
 		ptz_obj.keyCode = 2;
-		ptz_obj.onDone = function (ack) {
-			ptz_obj.keyState = 1;
-			ptz_obj.keyCode = 0;
-			ptz_obj.onDone = input.onDone;
-			l_ctrlPTZ_raw(ptz_obj);
-		}
 		l_ctrlPTZ_raw(ptz_obj);
+		l_ctrlPTZ_raw(up);
 		break;
 
 	case "left-down":
 		ptz_obj.keyCode = 2;
-		ptz_obj.onDone = function (ack) {
-			ptz_obj.keyState = 1;
-			ptz_obj.keyCode = 1;
-			ptz_obj.onDone = input.onDone;
-			l_ctrlPTZ_raw(ptz_obj);
-		}
 		l_ctrlPTZ_raw(ptz_obj);
+		l_ctrlPTZ_raw(down);
 		break;
 
 	case "zoomin":
