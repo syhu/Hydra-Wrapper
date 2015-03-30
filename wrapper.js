@@ -45,10 +45,20 @@ function wrapper(input) {
 
 wrapper.prototype.setup = function (input) {
 	if (typeof(input) !== "undefined") {
-		if (typeof(input.type) !== "undefined") {
+/*		if (typeof(input.type) !== "undefined") {
 			input.device_type = input.type;
 		}
-		switch (input.device_type) {
+*/
+		if (typeof(input.type) !== "undefined") {
+			input.protocol = input.type;
+		}
+
+		if (typeof(input.device_type) !== "undefined") {
+			input.protocol = input.device_type;
+		}
+
+//		switch (input.device_type) {
+		switch (input.protocol) {
 		case "onvif":
 			var onvif = require("./devices/onvifc.js");
 
@@ -81,7 +91,7 @@ wrapper.prototype.setup = function (input) {
 			break;
 
 		default:
-			LOG.warn("not support");
+			LOG.warn("not support protocol: " + input.protocol);
 		}
 	}
 }
