@@ -50,11 +50,15 @@ wrapper.prototype.setup = function (input) {
 		}
 */
 		if (typeof(input.type) !== "undefined") {
-			input.protocol = input.type;
+			if (typeof(input.protocol) === "undefined") {
+				input.protocol = input.type;
+			}
 		}
 
 		if (typeof(input.device_type) !== "undefined") {
-			input.protocol = input.device_type;
+			if (typeof(input.protocol) === "undefined") {
+				input.protocol = input.device_type;
+			}
 		}
 
 //		switch (input.device_type) {
