@@ -129,8 +129,12 @@ deeplet.prototype.setupConnector = function (input) {
 		// libPath undefined
 		var connector = require("../../connector/dvr_deeplet/dvr_connector_OO.js");
 
-	} else {
-		var connector = require(global.g_settings.path.connector + "deeplet/dvr_connector_OO.js");
+	} else if (typeof(global) !== "undefined" && typeof(global.g_settings) !== "undefined" && typeof(global.g_settings.path) !== "undefined") {
+		if (typeof(global.g_settings.path.connector) === "undefined") {
+			var connector = require(global.g_settings.path.base + "/connector/dvr_deeplet/dvr_connector_OO.js")
+		} else {
+			var connector = require(global.g_settings.path.connector + "deeplet/dvr_connector_OO.js");
+		}
 	}
 
 	// create connector
