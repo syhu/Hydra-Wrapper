@@ -81,7 +81,13 @@ deeplet.prototype.setupConnector = function (input) {
 
 	//~ input.self = this;
 	this.data = input;
-	var init_obj = input;
+	var init_obj = {
+		"host": input.host,
+		"port": input.port,
+		"onError": input.onError,
+		"onNotify": input.onNotify,
+	}
+	// input;
 
 	// check onDone
 	if (typeof(input.onDone) === "undefined") {
@@ -132,7 +138,7 @@ deeplet.prototype.setupConnector = function (input) {
 	this.dvr_connector = new connector();
 	var this_wrapper = this;
 	var login_data = {
-		"onDone": input.onDone,
+		// "onDone": input.onDone,
 		"onFail": input.onFail,
 		"user": input.user,
 		"passwd": input.passwd,
@@ -142,6 +148,8 @@ deeplet.prototype.setupConnector = function (input) {
 		login_data.onDone = function (returns) {
 			this_wrapper.dvr_connector.strm(stream_data);
 		};
+	} else {
+		login_data.onDone = input.onDone;
 	}
 
 	init_obj.onDone = function (returns) {
