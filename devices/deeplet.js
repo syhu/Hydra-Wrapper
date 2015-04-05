@@ -54,7 +54,20 @@ deeplet.prototype.checkCallbacks = function (input) {
 deeplet.prototype.setupConnector = function (input) {
 	this.checkCallbacks(input);
 	LOG.warn('setupDeepletConnector');
-
+	
+	if (typeof(input.onFail) === "undefined") {
+		if (typeof(input.onError)) {
+			input.onFail = input.onError;
+			input.onFail("deeplet wrapper: input.onFail undefined, using onError");
+		} else {
+			input.onFail = function (input) {
+				LOG.warn(input);
+			};
+			input.onFail("deeplet wrapper: input.onFail undefined. using default warn()");
+		}
+		
+	}
+	
 	if (typeof(input.host) === "undefined") {
 		LOG.error("deeplet wrapper: input.host undefined");
 
@@ -84,7 +97,7 @@ deeplet.prototype.setupConnector = function (input) {
 	var init_obj = {
 		"host": input.host,
 		"port": input.port,
-		"onError": input.onError,
+		"onError": input.onFail,
 		"onNotify": input.onNotify,
 	}
 	// input;
