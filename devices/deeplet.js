@@ -97,7 +97,7 @@ deeplet.prototype.setupConnector = function (input) {
 	var init_obj = {
 		"host": input.host,
 		"port": input.port,
-		"onError": input.onFail,
+		"onFail": input.onFail,
 		"onNotify": input.onNotify,
 	}
 	// input;

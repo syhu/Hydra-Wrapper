@@ -35,8 +35,6 @@ function wrapper(input) {
 	var wrapper_varA = "QAQ";
 	var wrapper_varB = "@Q@";
 	
-	console.log("lib/wrapper/wrapper.js: require A_A");
-	
 	if (typeof(input) !== "undefined") {
 		LOG.warn("input defined");
 		this.setup(input);
@@ -46,7 +44,6 @@ function wrapper(input) {
 }
 
 wrapper.prototype.setup = function (input) {
-	console.log("lib/wrapper/wrapper.js: setup A_A");
 	if (typeof(input) !== "undefined") {
 /*		if (typeof(input.type) !== "undefined") {
 			input.device_type = input.type;
@@ -79,17 +76,12 @@ wrapper.prototype.setup = function (input) {
 
 		case "deeplet":
 			LOG.warn("require deeplet wrapper");
-			console.log("lib/wrapper/wrapper.js: going to require deeplet~~ A_A");
 			var deeplet = require("./devices/deeplet.js");
 			
-			console.log("lib/wrapper/wrapper.js: copy self proto~~ A_A");
 			this.prototype = this.__proto__;
-			console.log("lib/wrapper/wrapper.js: copy deeplet proto~~ A_A");
 			this.__proto__ = new deeplet();
-			console.log("lib/wrapper/wrapper.js: call call call call call call me dance~~ A_A");
 			//~ deeplet.call(this, input);
 			deeplet.call(this);
-			console.log("lib/wrapper/wrapper.js: setupConnector~~ A_A");
 			this.setupConnector(input);
 			break;
 
