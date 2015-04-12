@@ -92,13 +92,16 @@ deeplet.prototype.setupConnector = function (input) {
 		}
 	}
 
-	//~ input.self = this;
 	this.data = input;
 	var init_obj = {
 		"host": input.host,
 		"port": input.port,
 		"onFail": input.onFail,
 		"onNotify": input.onNotify,
+	}
+
+	if (typeof(input.streamIDs) !== "undefined") {
+		init_obj.streamIDs = input.streamIDs;
 	}
 	// input;
 
