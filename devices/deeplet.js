@@ -47,6 +47,8 @@ deeplet.prototype.checkCallbacks = function (input) {
 		} else if ((typeof(input.onFail) === "undefined") && typeof(input.onError !== "undefined")) {
 			input.onFail = input.onError;
 		}
+	} else {
+		LOG.error("");
 	}
 }
 
@@ -356,7 +358,7 @@ deeplet.prototype.disconnect = function (input) {
 		},
 		"onFail": input.onFail
 	};
-	this.dvr_connector.disconnectStream(disconn_stream);
+	this.dvr_connector.strm_disconn(disconn_stream);
 }
 
 /*
