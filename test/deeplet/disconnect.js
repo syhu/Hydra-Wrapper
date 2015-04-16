@@ -1,55 +1,32 @@
 var fs = require("fs");
-// FIXME, use global.path
 var demosite = JSON.parse(fs.readFileSync("../../../Hydra-Connector-DVR/test/demosite.json", "utf8"));
 
 test = function (input) {
 	var self = this;
-
 	var onDone = function (response) {
 		console.log("onDone");
-		if (typeof(response) !== "undefined") {
+		if (typeof(response) !== "undefined")
 			console.log(response);
-		}
-	};
-
-	var onFail = function (response) {
-		console.log("onFail");
+	}
+	var onError = function (response) {
+		console.log("onError");
 		console.log(response);
-	};
+	}
 	var onNotify = function (response) {
 		console.log("onNotify");
 		console.log(response);
-	};
-	var onData = function (response) {
-		if (typeof(response) !== "undefined") {
-			console.log("onData, ch: " + response.ch);
-		}
-	};
+	}
 
-	var stream = {
-		"dataport": 50068,
-		"onData": onData,
+	var getDevInfo = {
 		"onDone": function (response) {
-			console.log("stream.onDone");
-			console.trace();
-			console.log(onDone.toString());
-			self.wrapper.disconnect({
-				"onDone": console.log,
-				"onFail": onFail
-			});
+			self.wrapper.disconnect({"onDone": onDone, "onError": onError});
 		},
-		"onFail": onFail,
-		"streanIDs": [1,2,3,4]
+		"onError": onError
 	};
 
 	var setup = {
-		"onDone": function (response) {
-			console.log("setup.onDone");
-			console.trace();
-			console.log(stream.onDone.toString());
-			self.wrapper.connectStream(stream);
-		},
-		"onFail": onFail,
+		"onDone": onDone,
+		"onError": onError,
 		"onNotify": onNotify,
 		"device_type": "deeplet",
 		"host": demosite.host,
@@ -58,9 +35,22 @@ test = function (input) {
 		"passwd": demosite.passwd
 	};
 
+	setup.onDone = function (response) {
+		self.wrapper.getDeviceInformation(getDevInfo);
+	};
+
 	var wrapper = require("../../wrapper.js");
 	this.wrapper = new wrapper();
-//	console.log(setup.onDone.toString());
 	this.wrapper.setup(setup);
+
+/*	while (typeof(this.wrapper.getDeviceInformation) === "undefined") {
+		if (typeof(this.wrapper.getDeviceInformation) !== "undefined") {
+			console.log("getDeviceInformation");
+			this.wrapper.getDeviceInformation(getDevInfo);
+		}
+	}
+//	console.log(this.wrapper.__proto__);
+	this.wrapper.getDeviceInformation(getDevInfo);
+*/
 }
 test();

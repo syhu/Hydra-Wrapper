@@ -358,7 +358,11 @@ deeplet.prototype.disconnect = function (input) {
 		},
 		"onFail": input.onFail
 	};
-	this.dvr_connector.strm_disconn(disconn_stream);
+	if (typeof(this.dvr_connector.data_port) === "undefined") {
+		this.dvr_connector.exit(disconn_ctrl);
+	} else {
+		this.dvr_connector.strm_disconn(disconn_stream);
+	}
 }
 
 /*
