@@ -343,6 +343,22 @@ deeplet.prototype.exit = function (input) {
 	this.dvr_connector.exit(input);
 }
 
+deeplet.prototype.disconnect = function (input) {
+	var self = this;
+	this.checkCallbacks(input);
+	var disconn_ctrl = {
+		"onDone": input.onDone,
+		"onFail": input.onFail
+	};
+	var disconn_stream = {
+		"onDone": function (response) {
+			self.dvr_connector.exit(disconn_ctrl);
+		},
+		"onFail": input.onFail
+	};
+	this.dvr_connector.disconnectStream(disconn_stream);
+}
+
 /*
 deeplet.prototype.l_ctrlPTZ = function (ptz_obj) {
 	var ptz_ctrl = setInterval (function () {
