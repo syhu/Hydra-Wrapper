@@ -329,7 +329,13 @@ deeplet.prototype.connectStream = function (input) {
 	LOG.warn(this.data);
 
 	// 一定要連 dataport 50068
-	this.dvr_connector.strm(this.data);
+	var connect_strm = {
+		"dataport": input.dataport,
+		"onData": input.onData,
+		"onDone": input.onDone,
+		"onFail": input.onFail
+	};
+	this.dvr_connector.strm(connect_strm);
 }
 
 
@@ -1080,7 +1086,8 @@ deeplet.prototype.MotionDetectionSettings = function (input) {
 }
 
 
-deeplet.prototype.PrivacyMaskSettings = function (input) {
+deeplet.prototype.setPrivacyMasks = function (input) {
+	var self = this;
 	this.checkCallbacks(input);
 	var PMask = {
 		"numOfMasks": input.Masks.length,
@@ -1098,7 +1105,7 @@ deeplet.prototype.PrivacyMaskSettings = function (input) {
 	}
 //	console.log(input.Masks.length);
 	var update = function (QAQ) {
-		this.dvr_connector.update_addmem_info({"onDone": input.onDone, "onFail": input.onFail}); // 5
+		self.dvr_connector.update_addmem_info({"onDone": input.onDone, "onFail": input.onFail}); // 5
 	}
 	var orig_obj = {
 		"key": "CamsAttrEx",
@@ -1115,7 +1122,7 @@ deeplet.prototype.PrivacyMaskSettings = function (input) {
 			};
 			ack.VtAddShareMemsAccess.VtAddShareMem.data.PMask[input.ch] = PMask;
 			setPMask.data.PMask = ack.VtAddShareMemsAccess.VtAddShareMem.data.PMask;
-			this.dvr_connector.set_addmem_info_camex(setPMask);
+			self.dvr_connector.set_addmem_info_camex(setPMask);
 		},
 		"onFail": input.onFail,
 	}
