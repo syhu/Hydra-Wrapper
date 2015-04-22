@@ -51,32 +51,11 @@ function onvifc(input) {
 //~ var INIT = function (obj) {
 onvifc.prototype.init = function (input) {
 	this.data = input;
-	this.data.debug = {};
-//	LOG.warn(this.data);
-//	console.log("ovif init onError: ", (this.data.onError));
-	if (this.data.device_type === "onvifAutoscan") {
-		discovery.probe(function(_null, rinfo){
-                	input.onDone({
-                        	"IP" : rinfo.hostname,
-                        	"Port" : rinfo.port,
-                        	"Path" : rinfo.path
-                	});
-        	});
-
-		return this;
-	}
-	//return;
 	LOG.warn('initiating: ip-' + this.data.host 
 		+ ' port-' + this.data.port 
 		+ ' username-' + this.data.user 
 		+ ' password-' + this.data.passwd + ' ');
 
-	// execute(obj.operation, obj.ip, argv4, obj.onDone, obj.onError);
-
-//	this.obj.debug = {};
-//	obj.onDone({status: this.obj});
-	// input.onDone({status: this.data});
-	input.onDone(this.__proto__);
 	return this;
 };
 
@@ -90,9 +69,10 @@ onvifc.prototype.autoScan = function(input){
 				"Path" : cam.path
 			});
 		});
-		if(cams == []){
-			input.onDone({
-				"ERROR" : "NO IPCams"
+		console.log(typeof(cams));
+		if(cams == null){
+			input.onFail({
+				"Error": "NO IPCams"
 			});
 		} else{
 			input.onDone(cams);
@@ -144,7 +124,7 @@ onvifc.prototype.getDeviceInformation = function(input){
 									"rtsp" : Uri_stream.uri
 								});
 							} else{
-								input.onError({
+								input.onFail({
 									"Error" : "NULL"
 								});
 							}
@@ -157,10 +137,21 @@ onvifc.prototype.getDeviceInformation = function(input){
 			})
 		//if on error
 	}).on('error', function(){
-		input.onError({
+		input.onFail({
 			"Error" : "check your IP!"	
 		});
 	});
+};
+
+onvifc.prototype.getImagingSettings = function (input) {
+	this.execute(
+		'GetImagingSettings',
+		'',
+		'',
+		input.onDone,
+		input.onFail
+	);
+	
 };
 
 // 傳回 ipcam 的硬體資訊 
@@ -173,7 +164,7 @@ onvifc.prototype.getHardwareInfo = function (input) {
 		this.data.ip,
 		'',
 		input.onDone,
-		input.onError
+		input.onFail
 	);
 };
 
@@ -188,7 +179,7 @@ onvifc.prototype.getNetworkInfo = function (input) {
 			input.onDone({status:out});
 		},
 		function (err) {
-			input.onError(err);
+			input.onFail(err);
 		}
 	); 
 };
@@ -206,13 +197,13 @@ onvifc.prototype.brightness = function (val) {
 onvifc.prototype.brightness = function (input) {
 	var wrapper_obj = this.obj;
 	var local_obj = {
-		onError: input.onError
+		onFail: input.oniFail
 	};
 
 	var this_connector = this;
 	local_obj.onDone = function (ret) {
 		var obj_setting = {
-			onError: local_obj.onError
+			onFail: local_obj.onFail
 		};
 //		ret[1].GetImagingSettings.ImagingSettings.Brightness = obj_in.value;
 		obj_setting.operation = "SetImagingSettings";
@@ -297,13 +288,13 @@ onvifc.prototype.brightness = function (input) {
 onvifc.prototype.colorSaturation = function (input) {  
 	var wrapper_obj = this.obj;
 	var local_obj = {
-		onError: input.onError
+		onFail: input.onFail
 	};
 
 	var this_connector = this;
 	local_obj.onDone = function(ret){
 		var obj_setting = {
-			onError: local_obj.onError
+			onFail: local_obj.onFail
 		};
 		obj_setting.operation = "SetImagingSettings";
 		obj_setting.argv4 = 
@@ -388,13 +379,13 @@ onvifc.prototype.colorSaturation = function (input) {
 onvifc.prototype.contrast = function (input) {  
 	var wrapper_obj = this.obj;
         var local_obj = {
-                onError: input.onError
+                onFail: input.onFail
         };
 
         var this_connector = this;
         local_obj.onDone = function(ret){
                 var obj_setting = {
-                        onError: local_obj.onError
+                        onFail: local_obj.onFail
                 };
                 obj_setting.operation = "SetImagingSettings";
                 obj_setting.argv4 =
@@ -479,13 +470,13 @@ onvifc.prototype.contrast = function (input) {
 onvifc.prototype.sharpness = function (input) {  
 	var wrapper_obj = this.obj;
         var local_obj = {
-                onError: input.onError
+                onFail: input.onFail
         };
 
         var this_connector = this;
         local_obj.onDone = function(ret){
                 var obj_setting = {
-                        onError: local_obj.onError
+                        onFail: local_obj.onFail
                 };
                 obj_setting.operation = "SetImagingSettings";
                 obj_setting.argv4 =
@@ -576,26 +567,8 @@ onvifc.prototype.sharpness = function (input) {
 onvifc.prototype.execOperation = function(input) {
 	console.log("onvifc.prototype.execOperation: obj: ", input);
 	console.log("onvifc.prototype.execOperation: this.obj: ", this.data);
-	this.execute(input.operation, this.data.ip, input.argv4, input.onDone, input.onError);
+	this.execute(input.operation, this.data.ip, input.argv4, input.onDone, input.onFail);
 };
-/*
-onvifc.prototype.probe = function(){
-	var command = "./Probe";
-	exec(command, function(error, stdout, stderr) {
-		try {
-			if (stderr) {
-				console.log(stderr);
-				var output = JSON.parse(stderr); //如果 stderr 存在就吃 stderr
-			}
-//			else {
-			if (stdout) {
-				console.log(stdout);
-				var output = JSON.parse(stdout); //否則就吃 stdout
-			}
-		
-	}
-	) 
-}*/
 
 /* 
 onvifc.prototype.saveObj = function (obj) {
@@ -611,14 +584,9 @@ onvifc.prototype.getObj = function (prop) {
 };
 */
 
-onvifc.prototype.execute = function (operation, ip, argv4, onDone, onError) {
-	console.log("onDone type :", typeof(onDone));
-	console.log("onDone context :", onDone);
+onvifc.prototype.execute = function (operation, ip, argv4, onDone, onFail) {
 	var wrapper_data = this.data;
-	console.log("onError type :", typeof(onError));
 //	var saveObj = this.saveObj;
-	
-	console.log("execute: operation: ", this);
 	
 	var command;
 	if (operation == "Probe") {
@@ -626,7 +594,7 @@ onvifc.prototype.execute = function (operation, ip, argv4, onDone, onError) {
 	} else {
 		switch (process.platform) {
 			case 'linux':
-				command = './connector/onvif/onvifc ';
+				command = '../../../../connector/onvif/onvifc ';
 			break;
 			
 			case 'win32':
@@ -638,7 +606,7 @@ onvifc.prototype.execute = function (operation, ip, argv4, onDone, onError) {
 				process.exit(99);
 			break;
 		}
-		command += "--operation " + operation + " --ip " + this.data.ip + " --port " + this.data.port + " --username " + this.data.username + " --password " + this.data.password;
+		command += "--operation " + operation + " --ip " + this.data.host + " --port " + this.data.port + " --username " + this.data.user + " --password " + this.data.passwd;
 	}
 	
 	if (argv4) {
@@ -718,7 +686,7 @@ onvifc.prototype.execute = function (operation, ip, argv4, onDone, onError) {
 			LOG.warn('Wrong: ' + err + "\n\n" + err.message);
 			sys.print('stdout: ' + stdout);
 			sys.print('stderr: ' + stderr);
-			onError({'error:': 'onvifc has error, please check! '});
+			onFail({'error:': 'onvifc has error, please check! '});
 			return;
 		}
 
