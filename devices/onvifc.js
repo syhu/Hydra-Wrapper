@@ -160,6 +160,35 @@ onvifc.prototype.getImagingSettings = function (input) {
 	
 };
 
+onvifc.prototype.setImagingSettings = function (input) {
+	var token, argv4;
+	//FIXME need to find token
+	if(input.channel == "ch_1")	token = "H264_0";
+	else token == "H264_0";
+
+	if(!(typeof(input.brightness) === "undefined"))
+		argv4 += " --Brightness " + input.brightness;
+	
+	if(!(typeof(input.colorsaturation) === "undefined"))
+		argv4 += " --ColorSaturation " + input.colorsaturation;
+
+	if(!(typeof(input.contrast) === "undefined"))
+		argv4 += " --Contrast " + input.contrast;
+
+	if(!(typeof(input.sharpness) === "undefined"))
+		argv4 += " --Sharpness " + input.sharpness;
+
+	argv4 += " --Channel " + token;
+	this.execute(
+		'SetImagingSettings',
+		'',
+		argv4,
+		input.onDone,
+		input.onFail
+	);
+	
+};
+
 onvifc.prototype.getVideoEncoderConfiguration = function (input) {
 	var source, argv4;
 	//FIXME need to find source
@@ -249,16 +278,17 @@ onvifc.prototype.brightness = function (input) {
 		obj_setting.operation = "SetImagingSettings";
 		obj_setting.argv4 =
 			" --Brightness " + input.value//ret[1].GetImagingSettings.ImagingSettings.Brightness
-			+ " --ColorSaturation " + ret[1].GetImagingSettings.ImagingSettings.ColorSaturation
-			+ " --Contrast " + ret[1].GetImagingSettings.ImagingSettings.Contrast
-			+ " --Sharpness " + ret[1].GetImagingSettings.ImagingSettings.Sharpness;
+			+ " --ColorSaturation " + ret[0].GetImagingSettings.ImagingSettings.ColorSaturation
+			+ " --Contrast " + ret[0].GetImagingSettings.ImagingSettings.Contrast
+			+ " --Sharpness " + ret[0].GetImagingSettings.ImagingSettings.Sharpness
+			+ " --Channel " + input.channel;
 		obj_setting.onDone = function () {
-			input.onDone(ret[1].GetImagingSettings.ImagingSettings);
+			input.onDone(ret[0].GetImagingSettings.ImagingSettings);
 		};
 		this_connector.execOperation(obj_setting);
 	};
-	local_obj.operation = "GetImagingSettings";
-	this.execOperation(local_obj);
+	local_obj.channel = input.channel;
+	this.getImagingSettings(local_obj);
 /*
 	var out = function (output) {
 		var currentSettings = obj_in.debug['GetImagingSettings'].GetImagingSettings.ImagingSettings;
