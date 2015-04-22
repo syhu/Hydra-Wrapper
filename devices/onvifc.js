@@ -144,10 +144,50 @@ onvifc.prototype.getDeviceInformation = function(input){
 };
 
 onvifc.prototype.getImagingSettings = function (input) {
+	var token, argv4;
+	//FIXME need to find token
+	if(input.channel == "ch_1")	token = "H264_0";
+	else token == "H264_0";
+	argv4 = " --Channel " + token;
+
 	this.execute(
 		'GetImagingSettings',
 		'',
+		argv4,
+		input.onDone,
+		input.onFail
+	);
+	
+};
+
+onvifc.prototype.getVideoEncoderConfiguration = function (input) {
+	var source, argv4;
+	//FIXME need to find source
+	if(input.channel == "ch_1")	source = "Encoder_H264_1";
+	else source == "Encoder_H264_0";
+	
+	argv4 = " --EncoderChannel " + source;
+	this.execute(
+		'GetVideoEncoderConfiguration',
 		'',
+		argv4,
+		input.onDone,
+		input.onFail
+	);
+	
+};
+
+onvifc.prototype.setVideoEncoderConfiguration = function (input) {
+	var source;
+	//FIXME need to find source
+	if(input.channel == "ch_1")	source = "Encoder_H264_1";
+	else source == "Encoder_H264_0";
+	
+	argv4 = " --configurationsource " + source;
+	this.execute(
+		'GetImagingSettings',
+		'',
+		argv4,
 		input.onDone,
 		input.onFail
 	);

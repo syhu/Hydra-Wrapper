@@ -40,7 +40,7 @@ test = function (input) {
 	var wrapper = require("../../wrapper.js");
 	this.wrapper = new wrapper();
 	this.wrapper.setup(setup);
-	this.wrapper.getImagingSettings(getDevInfo);
+	this.wrapper.getVideoEncoderConfiguration(getDevInfo);
 
 /*	while (typeof(this.wrapper.getDeviceInformation) === "undefined") {
 		if (typeof(this.wrapper.getDeviceInformation) !== "undefined") {
