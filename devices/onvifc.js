@@ -664,7 +664,7 @@ onvifc.prototype.execute = function (operation, ip, argv4, onDone, onFail) {
 	} else {
 		switch (process.platform) {
 			case 'linux':
-				command = '../../../../connector/onvif/onvifc ';
+				command = './connector/onvif/onvifc ';
 			break;
 			
 			case 'win32':
