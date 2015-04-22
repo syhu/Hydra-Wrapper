@@ -85,14 +85,20 @@ onvifc.prototype.autoScan = function(input){
 		var cams = [];
 		rinfo.forEach(function(cam){
 			cams.push({
-                       		"IP" : cam.hostname,
-                    	   	"Port" : cam.port,
-                       		"Path" : cam.path
+				"IP" : cam.hostname,
+				"Port" : cam.port,
+				"Path" : cam.path
 			});
 		});
-		input.onDone(cams);
-		console.log(cams);
-        });
+		if(cams == []){
+			input.onDone({
+				"ERROR" : "NO IPCams"
+			});
+		} else{
+			input.onDone(cams);
+			console.log(cams);
+			}
+		});
 	
 };
 
@@ -130,12 +136,18 @@ onvifc.prototype.getDeviceInformation = function(input){
 		 				var cam_this = this;
 						cam_this.getStreamUri({profileToken:'Stream_1'},function(err, uri){
 							Uri_stream = uri;
-							input.onDone({
-								"Model" : stream.model,
-								"Serial" : stream.serialNumber,
-								"Version" : stream.firmwareVersion,
-								"rtsp" : Uri_stream.uri
-							});
+							if(stream !== null && uri !== null){
+								input.onDone({
+									"Model" : stream.model,
+									"Serial" : stream.serialNumber,
+									"Version" : stream.firmwareVersion,
+									"rtsp" : Uri_stream.uri
+								});
+							} else{
+								input.onError({
+									"Error" : "NULL"
+								});
+							}
 						});
 
 					});
