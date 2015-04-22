@@ -54,6 +54,7 @@ deeplet.prototype.checkCallbacks = function (input) {
 
 // create and initialize connector
 deeplet.prototype.setupConnector = function (input) {
+	var self = this;
 	this.checkCallbacks(input);
 	LOG.warn('setupDeepletConnector');
 	
@@ -158,7 +159,6 @@ deeplet.prototype.setupConnector = function (input) {
 	// create connector
 	LOG.warn("create connector");
 	this.dvr_connector = new connector();
-	var this_wrapper = this;
 	var login_data = {
 		// "onDone": input.onDone,
 		"onFail": input.onFail,
@@ -168,14 +168,14 @@ deeplet.prototype.setupConnector = function (input) {
 
 	if (typeof(stream_data) !== "undefined") {
 		login_data.onDone = function (returns) {
-			this_wrapper.dvr_connector.strm(stream_data);
+			self.dvr_connector.strm(stream_data);
 		};
 	} else {
 		login_data.onDone = input.onDone;
 	}
 
 	init_obj.onDone = function (returns) {
-		this_wrapper.dvr_connector.login(login_data);
+		self.dvr_connector.login(login_data);
 	};
 
 	this.dvr_connector.init(init_obj);
@@ -329,7 +329,13 @@ deeplet.prototype.connectStream = function (input) {
 	LOG.warn(this.data);
 
 	// 一定要連 dataport 50068
-	this.dvr_connector.strm(this.data);
+	var connect_strm = {
+		"dataport": input.dataport,
+		"onData": input.onData,
+		"onDone": input.onDone,
+		"onFail": input.onFail
+	};
+	this.dvr_connector.strm(connect_strm);
 }
 
 
@@ -696,12 +702,13 @@ deeplet.prototype.setHostname = function (input) {
 
 // FIXME
 deeplet.prototype.setSystemDateAndTime = function (input) {
+	var self = this;
 	this.checkCallbacks(input);
 	if (input.DateTimeType == "NTP") {
 		this.data.onDone = function (response) {
 			var update = function (after_set) {
 				var update_orz = function (QAQ) {
-					this.dvr_connector.update_mem_info({"onDone": input.onDone, "onFail": input.onFail}); // 5
+					self.dvr_connector.update_mem_info({"onDone": input.onDone, "onFail": input.onFail}); // 5
 				}
 
 				var set_ntp = {
@@ -721,10 +728,10 @@ deeplet.prototype.setSystemDateAndTime = function (input) {
 				}
 
 				var active_ntp = function (active) {
-					this.dvr_connector.set_mem_info_sys(set_ntp); // 4
+					self.dvr_connector.set_mem_info_sys(set_ntp); // 4
 				}
 
-				this.dvr_connector.update_mem_info({"onDone": active_ntp, "onFail": input.onFail}); // 3
+				self.dvr_connector.update_mem_info({"onDone": active_ntp, "onFail": input.onFail}); // 3
 			}
 			var disable_ntp = {
 				"onDone": update,
@@ -735,7 +742,7 @@ deeplet.prototype.setSystemDateAndTime = function (input) {
 			disable_ntp.data.TimeSync.TSPType = 0;
 			// set_ntp.data.TimeSync.TSP = "time.windows.com";
 			// console.log("%j", set_ntp);
-			this.dvr_connector.set_mem_info_sys(disable_ntp); // 2
+			self.dvr_connector.set_mem_info_sys(disable_ntp); // 2
 		}
 		this.dvr_connector.get_mem_info_sys(this.data); // 1
 
@@ -797,7 +804,7 @@ deeplet.prototype.setSystemDateAndTime = function (input) {
 			time_settings.data.wday = check.day(); // sunday: 0, Saturday: 6
 			time_settings.data.yday = check.dayOfYear();
 
-			this.dvr_connector.set_sys_time(time_settings);
+			self.dvr_connector.set_sys_time(time_settings);
 		}
 		this.dvr_connector.get_sys_time(this.data);
 	}
@@ -1025,36 +1032,35 @@ deeplet.prototype.UPDATEMEMINFO = function (input) {
 
 
 
-deeplet.prototype.MotionDetectionSettings = function (input) {
+deeplet.prototype.setMotionDetection = function (input) {
+	var self = this;
 	this.checkCallbacks(input);
+
+	var update = function (QAQ) {
+		self.dvr_connector.update_mem_info({"onDone": input.onDone, "onFail": input.onFail});
+	}
+
 	var orig_obj = {
 		"onDone": function (ack) {
-			var set = ack.MotionAttrs;
+			if (typeof(ack.MotionAttrs) !== "undefined") {
+				var set = ack.MotionAttrs;
+			} else {
+				input.onFail("Oops, Please try again ...");
+				return self;
+			}
 			set.ch[input.ch].Sensitivity = input.Sensitivity;
 			set.ch[input.ch].GridCnts = input.GridCnts;
-//				console.log(set.rows);
 			/**
 			 * bitmap to WinRow
 			 */
-//				console.log("bitmap to WinRow");
-//				console.log(JSON.stringify(input));
-//				console.log(JSON.stringify(ack));
 			var mask = 0, WinRow = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 			mask = 0xFFFFFFFF - Math.pow(2, (set.cols)) + 1;
-/*				for (var i = set.cols; i < 32; i++) {
-				mask = mask + (1 << i);
-				console.log(i + " " + set.cols + " " + JSON.stringify(mask));
-			}
-*/
-//				console.log(mask);
 			for (var i = 0; i < set.rows; i++) {
 				for (var j = 0; j < set.cols; j++) {
 					WinRow[i] += (input.map[i][j] << j);
-//						console.log(WinRow[i]);
 				}
 				WinRow[i] += mask;
-//					console.log(i + ": " + WinRow[i]);
 			}
 
 			for (var i = set.rows; i < 24; i++) {
@@ -1062,25 +1068,24 @@ deeplet.prototype.MotionDetectionSettings = function (input) {
 			}
 
 			set.ch[input.ch].WinRow = WinRow;
-//				console.log(JSON.stringify(set.ch[input.ch].WinRow));
-//				console.log(JSON.stringify(set.ch[0]));
+
 			var setting_obj = {
-				"onDone": input.onDone,
+				"onDone": update,
 				"onFail": input.onFail,
 				"data": set
 			};
-//				console.log(setting_obj);
-			this.dvr_connector.set_mem_info_motionattrs(setting_obj);
+			self.dvr_connector.set_mem_info_motionattrs(setting_obj);
 		},
 		"onFail": input.onFail,
 	};
 
-	console.log("get mattrs");
+	// console.log("get mattrs");
 	this.dvr_connector.get_mem_info_motionattrs(orig_obj);
 }
 
 
-deeplet.prototype.PrivacyMaskSettings = function (input) {
+deeplet.prototype.setPrivacyMasks = function (input) {
+	var self = this;
 	this.checkCallbacks(input);
 	var PMask = {
 		"numOfMasks": input.Masks.length,
@@ -1098,12 +1103,15 @@ deeplet.prototype.PrivacyMaskSettings = function (input) {
 	}
 //	console.log(input.Masks.length);
 	var update = function (QAQ) {
-		this.dvr_connector.update_addmem_info({"onDone": input.onDone, "onFail": input.onFail}); // 5
+		self.dvr_connector.update_addmem_info({"onDone": input.onDone, "onFail": input.onFail}); // 5
 	}
 	var orig_obj = {
 		"key": "CamsAttrEx",
 		"onDone": function (ack) {
-			console.log(PMask);
+			if (typeof(ack.VtAddShareMemsAccess) === undefined) {
+				input.onFail("Oops, Please try again");
+				return;
+			}
 			var setPMask = {
 				"onDone": update,
 				"onFail": input.onFail,
@@ -1115,7 +1123,7 @@ deeplet.prototype.PrivacyMaskSettings = function (input) {
 			};
 			ack.VtAddShareMemsAccess.VtAddShareMem.data.PMask[input.ch] = PMask;
 			setPMask.data.PMask = ack.VtAddShareMemsAccess.VtAddShareMem.data.PMask;
-			this.dvr_connector.set_addmem_info_camex(setPMask);
+			self.dvr_connector.set_addmem_info_camex(setPMask);
 		},
 		"onFail": input.onFail,
 	}
