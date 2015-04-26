@@ -207,14 +207,28 @@ onvifc.prototype.getVideoEncoderConfiguration = function (input) {
 };
 
 onvifc.prototype.setVideoEncoderConfiguration = function (input) {
-	var source;
+	var source, argv4;
 	//FIXME need to find source
 	if(input.channel == "ch_1")	source = "Encoder_H264_1";
 	else source == "Encoder_H264_0";
 	
-	argv4 = " --configurationsource " + source;
+	if(input.framerate !== "undefined")
+		argv4 += " --FrameRate " + input.framerate;
+	
+	if(input.bitrate !== "undefined")
+		argv4 += " --BitRate " + input.bitrate;
+
+	if(input.quality !== "undefined")
+		argv4 += " --Quality " + input.quality;
+
+	if(input.resolution_width !== "undefined")
+		argv4 += " --ResolutionWidth " + input.resolution_width;
+
+	if(input.resolution_height !== "undefined")
+		argv4 += " --ResolutionHeight " + input.resolution_height;
+	argv4 += " --EncoderChannel " + source;
 	this.execute(
-		'GetImagingSettings',
+		'SetVideoEncoderConfiguration',
 		'',
 		argv4,
 		input.onDone,
@@ -664,7 +678,7 @@ onvifc.prototype.execute = function (operation, ip, argv4, onDone, onFail) {
 	} else {
 		switch (process.platform) {
 			case 'linux':
-				command = './connector/onvif/onvifc ';
+				command = '../../../../connector/onvif/onvifc ';
 			break;
 			
 			case 'win32':
