@@ -69,6 +69,7 @@ onvifc.prototype.autoScan = function(input){
 				"Path" : cam.path
 			});
 		});
+/*
 		console.log(typeof(cams));
 		if(cams == null){
 			input.onFail({
@@ -78,8 +79,9 @@ onvifc.prototype.autoScan = function(input){
 			input.onDone(cams);
 			console.log(cams);
 			}
-		});
-	
+*/	
+		input.onDone(cams);
+	});
 };
 
 //顯示目前所有 ipcam 狀態
