@@ -147,7 +147,7 @@ onvifc.prototype.getImagingSettings = function (input) {
 	var token, argv4;
 	//FIXME need to find token
 	if(input.channel == "ch_1")	token = "H264_0";
-	else token == "H264_0";
+	else token = "H264_0";
 	argv4 = " --Channel " + token;
 
 	this.execute(
@@ -164,7 +164,7 @@ onvifc.prototype.setImagingSettings = function (input) {
 	var token, argv4;
 	//FIXME need to find token
 	if(input.channel == "ch_1")	token = "H264_0";
-	else token == "H264_0";
+	else token = "H264_0";
 
 	if(!(typeof(input.brightness) === "undefined"))
 		argv4 += " --Brightness " + input.brightness;
@@ -193,7 +193,7 @@ onvifc.prototype.getVideoEncoderConfiguration = function (input) {
 	var source, argv4;
 	//FIXME need to find source
 	if(input.channel == "ch_1")	source = "Encoder_H264_1";
-	else source == "Encoder_H264_0";
+	else source = "Encoder_H264_0";
 	
 	argv4 = " --EncoderChannel " + source;
 	this.execute(
@@ -210,7 +210,7 @@ onvifc.prototype.setVideoEncoderConfiguration = function (input) {
 	var source, argv4;
 	//FIXME need to find source
 	if(input.channel == "ch_1")	source = "Encoder_H264_1";
-	else source == "Encoder_H264_0";
+	else source = "Encoder_H264_0";
 	
 	if(input.framerate !== "undefined")
 		argv4 += " --FrameRate " + input.framerate;
@@ -678,7 +678,7 @@ onvifc.prototype.execute = function (operation, ip, argv4, onDone, onFail) {
 	} else {
 		switch (process.platform) {
 			case 'linux':
-				command = '../../../../connector/onvif/onvifc ';
+				command = './connector/onvif/onvifc ';
 			break;
 			
 			case 'win32':
@@ -725,29 +725,29 @@ onvifc.prototype.execute = function (operation, ip, argv4, onDone, onFail) {
 			//~ LOG.warn(output);
 			console.log("exec: wrapper_data: ", wrapper_data);
 			
-			output.debug = {};
+			/*output.*/debug = {};
 			for (var key in output){
 				//LOG.warn("ccc");
 				//LOG.warn(key);
 				LOG.warn("output[key][operation]", output[key][operation]);
 				console.log("output[key][operation]", output[key][operation]);
-				output.debug[key] = output[key];
+				/*output.*/debug[key] = output[key];
 				switch (key) {
 				case '0':
-					output.debug[operation] = output.debug['0'];
-					delete output.debug['0'];
+					/*output.*/debug[operation] = /*output.*/debug['0'];
+					delete /*output.*/debug['0'];
 					break;
 				case '1':
-					output.debug[operation] = output.debug['1'];
-					delete output.debug['1'];
+					/*output.*/debug[operation] = /*output.*/debug['1'];
+					delete /*output.*/debug['1'];
 					break;
 				case '2':
-					output.debug[operation] = output.debug['2'];
-					delete output.debug['2'];
+					/*output.*/debug[operation] = /*output.*/debug['2'];
+					delete /*output.*/debug['2'];
 					break;
 				case '3':
-					output.debug[operation] = output.debug['3'];
-					delete output.debug['3'];
+					/*output.*/debug[operation] = /*output.*/debug['3'];
+					delete /*output.*/debug['3'];
 					break;
 				default:
 					break;
