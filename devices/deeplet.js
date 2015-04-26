@@ -1030,7 +1030,24 @@ deeplet.prototype.UPDATEMEMINFO = function (input) {
 	this.dvr_connector.update_mem_info(input);
 }
 
+deeplet.prototype.getMotionDetection = function (input) {
+	var self = this;
+	this.checkCallbacks(input);
 
+	var update = function (QAQ) {
+		self.dvr_connector.update_mem_info({"onDone": input.onDone, "onFail": input.onFail});
+	}
+
+	var get_motion = {
+		"onDone": function (response) {
+			if (typeof(response.MotionAttrs) !== "undefined") {
+				console.log(response.MotionAttrs);
+			}
+		},
+		"onFail": input.onFail
+	}
+	this.dvr_connector.get_mem_info_motionattrs(orig_obj);
+}
 
 deeplet.prototype.setMotionDetection = function (input) {
 	var self = this;
