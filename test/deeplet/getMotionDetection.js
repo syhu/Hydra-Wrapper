@@ -17,6 +17,12 @@ test = function (input) {
 		console.log(response);
 	}
 
+	var motion = {
+		"ch": 0,
+		"onDone": onDone,
+		"onFail": onFail
+	}
+
 	var setup = {
 		"onFail": onFail,
 		"onNotify": onNotify,

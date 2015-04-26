@@ -1041,12 +1041,27 @@ deeplet.prototype.getMotionDetection = function (input) {
 	var get_motion = {
 		"onDone": function (response) {
 			if (typeof(response.MotionAttrs) !== "undefined") {
-				console.log(response.MotionAttrs);
+				// console.log(response.MotionAttrs);
+				var map = [];
+			} else {
+				input.onFail("Oops, Please try again ... ");
+				return self;
 			}
+			// console.log(response.MotionAttrs.ch[input.ch].WinRow);
+			var mask = 0xFFFFFFFF - Math.pow(2, (response.MotionAttrs.cols)) + 1;
+			for (var i = 0; i < response.MotionAttrs.rows; i++) {
+				var row = [];
+				for (var j = 0; j < response.MotionAttrs.cols; j++) {
+					row[j] = ((response.MotionAttrs.ch[input.ch].WinRow[i] - mask) >> j) % 2;
+				}
+				map[i] = row;
+			}
+			// console.log(map);
+			input.onDone(map);
 		},
 		"onFail": input.onFail
 	}
-	this.dvr_connector.get_mem_info_motionattrs(orig_obj);
+	this.dvr_connector.get_mem_info_motionattrs(get_motion);
 }
 
 deeplet.prototype.setMotionDetection = function (input) {
