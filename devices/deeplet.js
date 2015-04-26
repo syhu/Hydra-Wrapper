@@ -1108,7 +1108,7 @@ deeplet.prototype.setPrivacyMasks = function (input) {
 	var orig_obj = {
 		"key": "CamsAttrEx",
 		"onDone": function (ack) {
-			if (typeof(ack.VtAddShareMemsAccess) === undefined) {
+			if (typeof(ack.VtAddShareMemsAccess) === "undefined") {
 				input.onFail("Oops, Please try again");
 				return;
 			}
