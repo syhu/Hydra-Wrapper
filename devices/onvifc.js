@@ -56,6 +56,7 @@ onvifc.prototype.init = function (input) {
 		+ ' username-' + this.data.user 
 		+ ' password-' + this.data.passwd + ' ');
 
+	input.onDone(this.__proto__);
 	return this;
 };
 
@@ -69,7 +70,6 @@ onvifc.prototype.autoScan = function(input){
 				"Path" : cam.path
 			});
 		});
-/*
 		console.log(typeof(cams));
 		if(cams == null){
 			input.onFail({
@@ -79,8 +79,6 @@ onvifc.prototype.autoScan = function(input){
 			input.onDone(cams);
 			console.log(cams);
 			}
-*/	
-		input.onDone(cams);
 	});
 };
 
