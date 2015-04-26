@@ -162,23 +162,37 @@ onvifc.prototype.getImagingSettings = function (input) {
 
 onvifc.prototype.setImagingSettings = function (input) {
 	var token, argv4;
+	console.log("11111111111111111111111111111111");
+	console.log(argv4);
 	//FIXME need to find token
 	if(input.channel == "ch_1")	token = "H264_0";
 	else token = "H264_0";
 
+	console.log("a2222222222222222222222222");
+	console.log(argv4);
 	if(!(typeof(input.brightness) === "undefined"))
-		argv4 += " --Brightness " + input.brightness;
+		if(typeof(argv4) !== "undefined")
+			argv4 += " --Brightness " + input.brightness;
+		else	argv4 = " --Brightness " + input.brightness;
 	
 	if(!(typeof(input.colorsaturation) === "undefined"))
-		argv4 += " --ColorSaturation " + input.colorsaturation;
+		if(typeof(argv4) !== "undefined")
+			argv4 += " --ColorSaturation " + input.colorsaturation;
+		else	argv4 = " --ColorSaturation " + input.colorsaturation;
 
 	if(!(typeof(input.contrast) === "undefined"))
-		argv4 += " --Contrast " + input.contrast;
+		if(typeof(argv4) !== "undefined")
+			argv4 += " --Contrast " + input.contrast;
+		else	argv4 = " --Contrast " + input.contrast;
 
 	if(!(typeof(input.sharpness) === "undefined"))
-		argv4 += " --Sharpness " + input.sharpness;
+		if(typeof(argv4) !== "undefined")
+			argv4 += " --Sharpness " + input.sharpness;
+		else	argv4 = " --Sharpness " + input.sharpness;
 
 	argv4 += " --Channel " + token;
+	console.log("33333333333333333333333333333333");
+	console.log(argv4);
 	this.execute(
 		'SetImagingSettings',
 		'',
@@ -213,19 +227,29 @@ onvifc.prototype.setVideoEncoderConfiguration = function (input) {
 	else source = "Encoder_H264_0";
 	
 	if(input.framerate !== "undefined")
-		argv4 += " --FrameRate " + input.framerate;
+		if(typeof(argv4) !== "undefined")
+			argv4 += " --FrameRate " + input.framerate;
+		else argv4 += " --FrameRate " + input.framerate;
 	
 	if(input.bitrate !== "undefined")
-		argv4 += " --BitRate " + input.bitrate;
+		if(typeof(argv4) !== "undefined")
+			argv4 += " --BitRate " + input.bitrate;
+		else argv4 += " --BitRate " + input.bitrate; 
 
 	if(input.quality !== "undefined")
-		argv4 += " --Quality " + input.quality;
+		if(typeof(argv4) !== "undefined")
+			argv4 += " --Quality " + input.quality;
+		else argv4 += " --Quality " + input.quality;
 
 	if(input.resolution_width !== "undefined")
-		argv4 += " --ResolutionWidth " + input.resolution_width;
+		if(typeof(argv4) !== "undefined")
+			argv4 += " --ResolutionWidth " + input.resolution_width;
+		else argv4 += " --ResolutionWidth " + input.resolution_width;
 
 	if(input.resolution_height !== "undefined")
-		argv4 += " --ResolutionHeight " + input.resolution_height;
+		if(typeof(argv4) !== "undefined")
+			argv4 += " --ResolutionHeight " + input.resolution_height;
+		else argv4 += " --ResolutionHeight " + input.resolution_height;
 	argv4 += " --EncoderChannel " + source;
 	this.execute(
 		'SetVideoEncoderConfiguration',
