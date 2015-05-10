@@ -1089,8 +1089,10 @@ deeplet.prototype.setMotionDetection = function (input) {
 
 			mask = 0xFFFFFFFF - Math.pow(2, (set.cols)) + 1;
 			for (var i = 0; i < set.rows; i++) {
-				for (var j = 0; j < set.cols; j++) {
-					WinRow[i] += (input.map[i][j] << j);
+				if (typeof(input.map[0]) !== "undefined") {
+					for (var j = 0; j < set.cols; j++) {
+						WinRow[i] += (input.map[i][j] << j);
+					}
 				}
 				WinRow[i] += mask;
 			}
