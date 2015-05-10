@@ -1119,7 +1119,7 @@ deeplet.prototype.setMotionDetection = function (input) {
 
 deeplet.prototype.getPrivacyMasks = function (input) {
 	var self = this;
-	var Masks = [];
+	var map = [];
 	var orig_obj = {
 		"key": "CamsAttrEx",
 		"onDone": function (ack) {
@@ -1129,13 +1129,18 @@ deeplet.prototype.getPrivacyMasks = function (input) {
 			}
 			var PMask = ack.VtAddShareMemsAccess.VtAddShareMem.data.PMask[input.ch];
 			for (var i = 0; i < PMask.numOfMasks; i++) {
-				Masks[i] = {};
-				Masks[i].x = PMask.x[i];
+/*				Masks[i].x = PMask.x[i];
 				Masks[i].y = PMask.y[i];
 				Masks[i].width = PMask.width[i];
-				Masks[i].height = PMask.height[i];
+				Masks[i].height = PMask.height[i];*/
+				for (var j = 0; j < PMask.height[i]; j++) {
+					map[PMask.y[i] + j] = [];
+					for (var k = 0; k < PMask.width[i]; k++) {
+						map[PMask.y[i] + j][PMask.x[i] + k] = 1;
+					}
+				}
 			}
-			input.onDone(Masks);
+			input.onDone(map);
 		},
 		"onFail": input.onFail,
 	}
