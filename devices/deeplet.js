@@ -1115,6 +1115,30 @@ deeplet.prototype.setMotionDetection = function (input) {
 	this.dvr_connector.get_mem_info_motionattrs(orig_obj);
 }
 
+deeplet.prototype.getPrivacyMasks = function (input) {
+	var self = this;
+	var Masks = [];
+	var orig_obj = {
+		"key": "CamsAttrEx",
+		"onDone": function (ack) {
+			if (typeof(ack.VtAddShareMemsAccess) === "undefined") {
+				input.onFail("Oops, Please try again");
+				return;
+			}
+			var PMask = ack.VtAddShareMemsAccess.VtAddShareMem.data.PMask[input.ch];
+			for (var i = 0; i < PMask.numOfMasks; i++) {
+				Masks[i] = {};
+				Masks[i].x = PMask.x[i];
+				Masks[i].y = PMask.y[i];
+				Masks[i].width = PMask.width[i];
+				Masks[i].height = PMask.height[i];
+			}
+			input.onDone(Masks);
+		},
+		"onFail": input.onFail,
+	}
+	this.dvr_connector.get_addmem_info(orig_obj);
+}
 
 deeplet.prototype.setPrivacyMasks = function (input) {
 	var self = this;

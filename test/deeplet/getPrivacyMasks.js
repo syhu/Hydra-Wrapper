@@ -20,12 +20,6 @@ test = function (input) {
 	var pmask = {
 		"onDone": onDone,
 		"onFail": onFail,
-		"Masks": [
-			{"x": 0, "y": 0, "width": 1, "height": 1},
-			{"x": 1, "y": 1, "width": 1, "height": 1},
-			{"x": 2, "y": 2, "width": 1, "height": 1},
-
-		],
 		"ch": 0
 	};
 
@@ -40,7 +34,7 @@ test = function (input) {
 	};
 
 	setup.onDone = function (response) {
-		self.wrapper.setPrivacyMasks(pmask);
+		self.wrapper.getPrivacyMasks(pmask);
 	};
 
 	var wrapper = require("../../wrapper.js");
