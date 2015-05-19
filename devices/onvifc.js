@@ -93,6 +93,32 @@ onvifc.prototype.exit = function(input){
 	input.onDone("GG");
 }
 
+onvifc.prototype.getStreamUri = function(input){
+	var this_wrapper = this;
+	//for error ip input
+	var options = {
+		host: this.data.host,
+		port: 80,
+		path: ''
+	};
+
+	new Cam(
+		{
+			hostname: this_wrapper.data.host,
+			port: this_wrapper.data.port,
+			username: this_wrapper.data.user,
+			password: this_wrapper.data.passwd
+		},function(err){
+			this.getStreamUri(function(err, stream){
+				input.onDone({
+					"uristream" : stream
+				});
+			});
+		}
+	);
+	
+}
+
 onvifc.prototype.getDeviceInformation = function(input){
 	var this_wrapper = this;
 	//for error ip input
@@ -114,9 +140,10 @@ onvifc.prototype.getDeviceInformation = function(input){
 					this.getDeviceInformation(function(err, stream){
 						var Uri_stream;
 		 				var cam_this = this;
-						cam_this.getStreamUri({profileToken:'Stream_1'},function(err, uri){
+						cam_this.getStreamUri(function(err, uri){
 							Uri_stream = uri;
-							if(stream !== null && uri !== null){
+							if(typeof(stream) !== "undefined" && typeof(uri) !== "undefined"){
+								console.log(stream);
 								input.onDone({
 									"Model" : stream.model,
 									"Serial" : stream.serialNumber,
