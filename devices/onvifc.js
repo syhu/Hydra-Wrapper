@@ -180,19 +180,32 @@ onvifc.prototype.getVideoSources = function (input) {
 	);
 };
 onvifc.prototype.getImagingSettings = function (input) {
-	var token, argv4;
+	var token, argv4, this_wrapper = this;
 	//FIXME need to find token
-	if(input.channel == "ch_1")	token = "H264_0";
-	else token = "H264_0";
-	argv4 = " --Channel " + token;
+	var local_obj = {
+		onFail: input.onFail
+	};
 
-	this.execute(
-		'GetImagingSettings',
-		'',
-		argv4,
-		input.onDone,
-		input.onFail
-	);
+	local_obj.onDone = function(RET) {
+		console.log(RET.GetVideoSources);
+
+		oD = function() {
+			input.onDone(RET.GetVideoSources.VideoSources)
+		};
+
+		token = RET.GetVideoSources.VideoSources["token"];
+		argv4 = " --Channel " + token;
+
+		this_wrapper.execute(
+			'GetImagingSettings',
+			'',
+			argv4,
+			input.onDone,
+			local_obj.onFail
+		);
+	};
+
+	this_wrapper.getVideoSources(local_obj);
 	
 };
 
