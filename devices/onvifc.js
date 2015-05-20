@@ -170,6 +170,15 @@ onvifc.prototype.getDeviceInformation = function(input){
 	});
 };
 
+onvifc.prototype.getVideoSources = function (input) {
+	this.execute(
+		'GetVideoSources',
+		'',
+		'',
+		input.onDone,
+		input.onFail
+	);
+};
 onvifc.prototype.getImagingSettings = function (input) {
 	var token, argv4;
 	//FIXME need to find token
@@ -729,7 +738,7 @@ onvifc.prototype.execute = function (operation, ip, argv4, onDone, onFail) {
 	} else {
 		switch (process.platform) {
 			case 'linux':
-				command = './connector/onvif/onvifc ';
+				command = '../../../../connector/onvif/onvifc ';
 			break;
 			
 			case 'win32':
