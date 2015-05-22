@@ -179,20 +179,14 @@ onvifc.prototype.getVideoSources = function (input) {
 		input.onFail
 	);
 };
+
 onvifc.prototype.getImagingSettings = function (input) {
 	var token, argv4, this_wrapper = this;
-	//FIXME need to find token
 	var local_obj = {
 		onFail: input.onFail
 	};
 
 	local_obj.onDone = function(RET) {
-		console.log(RET.GetVideoSources);
-
-		oD = function() {
-			input.onDone(RET.GetVideoSources.VideoSources)
-		};
-
 		token = RET.GetVideoSources.VideoSources["token"];
 		argv4 = " --Channel " + token;
 
@@ -210,45 +204,45 @@ onvifc.prototype.getImagingSettings = function (input) {
 };
 
 onvifc.prototype.setImagingSettings = function (input) {
-	var token, argv4;
-	console.log("11111111111111111111111111111111");
-	console.log(argv4);
-	//FIXME need to find token
-	if(input.channel == "ch_1")	token = "H264_0";
-	else token = "H264_0";
+	var token, argv4, this_wrapper = this;
+	var local_obj = {
+		onFail: input.onFail
+	};
 
-	console.log("a2222222222222222222222222");
-	console.log(argv4);
-	if(!(typeof(input.brightness) === "undefined"))
-		if(typeof(argv4) !== "undefined")
-			argv4 += " --Brightness " + input.brightness;
-		else	argv4 = " --Brightness " + input.brightness;
+	local_obj.onDone = function(RET) {
+		if(!(typeof(input.brightness) === "undefined"))
+			if(typeof(argv4) !== "undefined")
+				argv4 += " --Brightness " + input.brightness;
+			else	argv4 = " --Brightness " + input.brightness;
 	
-	if(!(typeof(input.colorsaturation) === "undefined"))
-		if(typeof(argv4) !== "undefined")
-			argv4 += " --ColorSaturation " + input.colorsaturation;
-		else	argv4 = " --ColorSaturation " + input.colorsaturation;
+		if(!(typeof(input.colorsaturation) === "undefined"))
+			if(typeof(argv4) !== "undefined")
+				argv4 += " --ColorSaturation " + input.colorsaturation;
+			else	argv4 = " --ColorSaturation " + input.colorsaturation;
 
-	if(!(typeof(input.contrast) === "undefined"))
-		if(typeof(argv4) !== "undefined")
-			argv4 += " --Contrast " + input.contrast;
-		else	argv4 = " --Contrast " + input.contrast;
+		if(!(typeof(input.contrast) === "undefined"))
+			if(typeof(argv4) !== "undefined")
+				argv4 += " --Contrast " + input.contrast;
+			else	argv4 = " --Contrast " + input.contrast;
 
-	if(!(typeof(input.sharpness) === "undefined"))
-		if(typeof(argv4) !== "undefined")
-			argv4 += " --Sharpness " + input.sharpness;
-		else	argv4 = " --Sharpness " + input.sharpness;
+		if(!(typeof(input.sharpness) === "undefined"))
+			if(typeof(argv4) !== "undefined")
+				argv4 += " --Sharpness " + input.sharpness;
+			else	argv4 = " --Sharpness " + input.sharpness;
 
-	argv4 += " --Channel " + token;
-	console.log("33333333333333333333333333333333");
-	console.log(argv4);
-	this.execute(
-		'SetImagingSettings',
-		'',
-		argv4,
-		input.onDone,
-		input.onFail
-	);
+		token = RET.GetVideoSources.VideoSources["token"];
+		argv4 += " --Channel " + token;
+
+		this_wrapper.execute(
+			'SetImagingSettings',
+			'',
+			argv4,
+			input.onDone,
+			local_obj.onFail
+		);
+	};
+
+	this_wrapper.getVideoSources(local_obj);
 	
 };
 
@@ -751,7 +745,7 @@ onvifc.prototype.execute = function (operation, ip, argv4, onDone, onFail) {
 	} else {
 		switch (process.platform) {
 			case 'linux':
-				command = '../../../../connector/onvif/onvifc ';
+				command = './connector/onvif/onvifc ';
 			break;
 			
 			case 'win32':
