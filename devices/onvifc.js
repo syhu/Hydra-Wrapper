@@ -145,6 +145,7 @@ onvifc.prototype.getDeviceInformation = function(input){
 							if(typeof(stream) !== "undefined" && typeof(uri) !== "undefined"){
 								console.log(stream);
 								input.onDone({
+									"Manufacturer" : stream.manufacturer,
 									"Model" : stream.model,
 									"Serial" : stream.serialNumber,
 									"Version" : stream.firmwareVersion,
