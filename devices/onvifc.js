@@ -258,19 +258,27 @@ onvifc.prototype.setImagingSettings = function (input) {
 };
 
 onvifc.prototype.getVideoEncoderConfiguration = function (input) {
-	var source, argv4;
-	//FIXME need to find source
-	if(input.channel == "ch_1")	source = "Encoder_H264_1";
-	else source = "Encoder_H264_0";
-	
-	argv4 = " --EncoderChannel " + source;
-	this.execute(
-		'GetVideoEncoderConfiguration',
-		'',
-		argv4,
-		input.onDone,
-		input.onFail
-	);
+	var token, argv4, this_wrapper = this;
+	var local_obj = {
+		onFail: input.onFail
+	};
+
+	local_obj.onDone = function(RET) {
+		if(input.channel == "ch_0")
+			token = RET.token0;
+		else token = RET.token1;
+		argv4 = " --EncoderChannel " + token;
+
+		this_wrapper.execute(
+			'GetVideoEncoderConfiguration',
+			'',
+			argv4,
+			input.onDone,
+			local_obj.onFail
+		);
+	};
+
+	this_wrapper.getVideoEncoderConfigurations(local_obj);
 	
 };
 
@@ -756,7 +764,7 @@ onvifc.prototype.execute = function (operation, ip, argv4, onDone, onFail) {
 	} else {
 		switch (process.platform) {
 			case 'linux':
-				command = '../../../../connector/onvif/onvifc ';
+				command = './connector/onvif/onvifc ';
 			break;
 			
 			case 'win32':
