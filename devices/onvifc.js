@@ -283,43 +283,54 @@ onvifc.prototype.getVideoEncoderConfiguration = function (input) {
 };
 
 onvifc.prototype.setVideoEncoderConfiguration = function (input) {
-	var source, argv4;
-	//FIXME need to find source
-	if(input.channel == "ch_1")	source = "Encoder_H264_1";
-	else source = "Encoder_H264_0";
+	var token, argv4, this_wrapper = this;
+	var local_obj = {
+		onFail: input.onFail
+	};
+
+	local_obj.onDone = function(RET) {
+//for Encoder setting
+		if(input.framerate !== "undefined")
+			if(typeof(argv4) !== "undefined")
+				argv4 += " --FrameRate " + input.framerate;
+			else argv4 += " --FrameRate " + input.framerate;
 	
-	if(input.framerate !== "undefined")
-		if(typeof(argv4) !== "undefined")
-			argv4 += " --FrameRate " + input.framerate;
-		else argv4 += " --FrameRate " + input.framerate;
-	
-	if(input.bitrate !== "undefined")
-		if(typeof(argv4) !== "undefined")
-			argv4 += " --BitRate " + input.bitrate;
-		else argv4 += " --BitRate " + input.bitrate; 
+		if(input.bitrate !== "undefined")
+			if(typeof(argv4) !== "undefined")
+				argv4 += " --BitRate " + input.bitrate;
+			else argv4 += " --BitRate " + input.bitrate; 
 
-	if(input.quality !== "undefined")
-		if(typeof(argv4) !== "undefined")
-			argv4 += " --Quality " + input.quality;
-		else argv4 += " --Quality " + input.quality;
+		if(input.quality !== "undefined")
+			if(typeof(argv4) !== "undefined")
+				argv4 += " --Quality " + input.quality;
+			else argv4 += " --Quality " + input.quality;
 
-	if(input.resolution_width !== "undefined")
-		if(typeof(argv4) !== "undefined")
-			argv4 += " --ResolutionWidth " + input.resolution_width;
-		else argv4 += " --ResolutionWidth " + input.resolution_width;
+		if(input.resolution_width !== "undefined")
+			if(typeof(argv4) !== "undefined")
+				argv4 += " --ResolutionWidth " + input.resolution_width;
+			else argv4 += " --ResolutionWidth " + input.resolution_width;
 
-	if(input.resolution_height !== "undefined")
-		if(typeof(argv4) !== "undefined")
-			argv4 += " --ResolutionHeight " + input.resolution_height;
-		else argv4 += " --ResolutionHeight " + input.resolution_height;
-	argv4 += " --EncoderChannel " + source;
-	this.execute(
-		'SetVideoEncoderConfiguration',
-		'',
-		argv4,
-		input.onDone,
-		input.onFail
-	);
+		if(input.resolution_height !== "undefined")
+			if(typeof(argv4) !== "undefined")
+				argv4 += " --ResolutionHeight " + input.resolution_height;
+			else argv4 += " --ResolutionHeight " + input.resolution_height;
+//for channel setting
+		if(input.channel == "ch_0")
+			token = RET.token0;
+		else token = RET.token1;
+
+		argv4 += " --EncoderChannel " + token;
+
+		this_wrapper.execute(
+			'SetVideoEncoderConfiguration',
+			'',
+			argv4,
+			input.onDone,
+			local_obj.onFail
+		);
+	};
+
+	this_wrapper.getVideoEncoderConfigurations(local_obj);
 	
 };
 
