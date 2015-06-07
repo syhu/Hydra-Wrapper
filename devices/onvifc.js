@@ -181,6 +181,16 @@ onvifc.prototype.getVideoSources = function (input) {
 	);
 };
 
+onvifc.prototype.getVideoEncoderConfigurations = function (input) {
+	this.execute(
+		'GetVideoEncoderConfigurations',
+		'',
+		'',
+		input.onDone,
+		input.onFail
+	);
+};
+
 onvifc.prototype.getImagingSettings = function (input) {
 	var token, argv4, this_wrapper = this;
 	var local_obj = {
@@ -746,7 +756,7 @@ onvifc.prototype.execute = function (operation, ip, argv4, onDone, onFail) {
 	} else {
 		switch (process.platform) {
 			case 'linux':
-				command = './connector/onvif/onvifc ';
+				command = '../../../../connector/onvif/onvifc ';
 			break;
 			
 			case 'win32':
