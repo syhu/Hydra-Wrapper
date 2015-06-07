@@ -61,24 +61,83 @@ onvifc.prototype.init = function (input) {
 };
 
 onvifc.prototype.autoScan = function(input){
+	var this_wrapper = this;
 	discovery.probe(function(_null, rinfo){
 		var cams = [];
 		rinfo.forEach(function(cam){
-			cams.push({
+			var ip = cam.hostname;
+			var found = 0;
+			cams.forEach(function(outcam){
+				if(outcam.hostname == ip) {
+					found = 1;
+				}
+			});
+
+			if(!found) {
+				cams.push(cam);
+			}
+		});
+
+		console.log(typeof(cams));
+		var outputs = [];
+		var camCount = cams.length;
+		cams.forEach(function (cam) {
+			var output = {
 				"IP" : cam.hostname,
 				"Port" : cam.port,
 				"Path" : cam.path
+			};
+
+			var checkEmpty = 0;
+			cam.getDeviceInformation(function(err, stream) {
+				camCount = camCount - 1;
+				console.log(camCount);
+				console.log(stream);
+				if(typeof(stream) === "undefined" ) {
+					checkEmpty = 1;
+				} else {
+					output.Manufacturer = stream.manufacturer;
+					output.Model = stream.model;
+					output.Serial = stream.serial;
+					output.Version = stream.version;
+				}
+				if(checkEmpty) {
+					output.check = 0;
+					outputs.push(output);
+				} else {
+					output.check = 1;
+/*
+					onDone = function(ret) {
+						output.IPv4Address = ret.GetVideoEncoderConfiguration.Multicast.IPv4Address;
+						output.MultiPort = ret.GetVideoEncoderConfiguration.Multicast.Port;
+						output.TTL = ret.GetVideoEncoderConfiguration.Multicast.TTL;
+						outputs.push(output);
+					};
+			
+					var Info = {
+						"onDone" : onDone,
+						"onFail" : input.onFail,
+						"channel" : "ch_1"
+					};	
+					this_wrapper.getVideoEncoderConfiguration(Info);
+*/
+					outputs.push(output);
+				}
+				if(typeof(outputs) === "undefined"){
+					input.onFail({
+						"Error": "NO response"
+					});
+				} else{
+					console.log("Finalllllllllllllllllllllllllllllllllll");
+					console.log(outputs);
+					if(camCount == 0) {
+						input.onDone(outputs);
+					}
+				}
 			});
+
+
 		});
-		console.log(typeof(cams));
-		if(cams == null){
-			input.onFail({
-				"Error": "NO IPCams"
-			});
-		} else{
-			input.onDone(cams);
-			console.log(cams);
-			}
 	});
 };
 
