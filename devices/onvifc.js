@@ -83,6 +83,7 @@ onvifc.prototype.autoScan = function(input){
 		var outputs = [];
 		var camCount = cams.length;
 		cams.forEach(function (cam) {
+			var thisCam = cam;
 			var output = {
 				"IP" : cam.hostname,
 				"Port" : cam.port,
@@ -90,53 +91,47 @@ onvifc.prototype.autoScan = function(input){
 			};
 
 			var checkEmpty = 0;
-			cam.getDeviceInformation(function(err, stream) {
-				camCount = camCount - 1;
-				console.log(camCount);
-				console.log(stream);
-				if(typeof(stream) === "undefined" ) {
-					checkEmpty = 1;
-				} else {
-					output.Manufacturer = stream.manufacturer;
-					output.Model = stream.model;
-					output.Serial = stream.serial;
-					output.Version = stream.version;
-				}
-				if(checkEmpty) {
-					output.check = 0;
-					outputs.push(output);
-				} else {
-					output.check = 1;
-/*
-					onDone = function(ret) {
-						output.IPv4Address = ret.GetVideoEncoderConfiguration.Multicast.IPv4Address;
-						output.MultiPort = ret.GetVideoEncoderConfiguration.Multicast.Port;
-						output.TTL = ret.GetVideoEncoderConfiguration.Multicast.TTL;
-						outputs.push(output);
-					};
 			
-					var Info = {
-						"onDone" : onDone,
-						"onFail" : input.onFail,
-						"channel" : "ch_1"
-					};	
-					this_wrapper.getVideoEncoderConfiguration(Info);
-*/
-					outputs.push(output);
-				}
-				if(typeof(outputs) === "undefined"){
-					input.onFail({
-						"Error": "NO response"
+			
+			this_wrapper.getScopes({
+				address: thisCam.hostname + ":" + thisCam.port,
+				onDone: function (scopes) {
+					cam.getDeviceInformation(function(err, stream) {
+						
+						console.log(camCount);
+						console.log(stream);
+						
+						output.scopes = scopes;
+						
+						if(typeof(stream) === "undefined" ) {
+							checkEmpty = 1;
+						} else {
+							output.Manufacturer = stream.manufacturer;
+							output.Model = stream.model;
+							output.Serial = stream.serial;
+							output.Version = stream.version;
+						}
+						if(checkEmpty) {
+							output.check = 0;
+							outputs.push(output);
+						} else {
+							output.check = 1;
+							outputs.push(output);
+						}
+						if(typeof(outputs) === "undefined"){
+							input.onFail({
+								"Error": "NO response"
+							});
+						} else{
+							console.log("Finalllllllllllllllllllllllllllllllllll");
+							console.log(outputs);
+							if(0 == --camCount) {
+								input.onDone(outputs);
+							}
+						}
 					});
-				} else{
-					console.log("Finalllllllllllllllllllllllllllllllllll");
-					console.log(outputs);
-					if(camCount == 0) {
-						input.onDone(outputs);
-					}
 				}
 			});
-
 
 		});
 	});
@@ -838,6 +833,13 @@ onvifc.prototype.getObj = function (prop) {
 
 onvifc.prototype.execute = function (operation, ip, argv4, onDone, onFail) {
 	var wrapper_data = this.data;
+	var targetIP, targetPort;
+	if (ip) {	// 1.2.3.4:80
+		(targetIP, targetPort) = split(/:/,ip);
+	} else {
+		targetIP = this.data.host;
+		targetPort = this.data.port;
+	}
 //	var saveObj = this.saveObj;
 	
 	var command;
@@ -858,7 +860,7 @@ onvifc.prototype.execute = function (operation, ip, argv4, onDone, onFail) {
 				process.exit(99);
 			break;
 		}
-		command += "--operation " + operation + " --ip " + this.data.host + " --port " + this.data.port + " --username " + this.data.user + " --password " + this.data.passwd;
+		command += "--operation " + operation + " --ip " + targetIP + " --port " + targetPort + " --username " + this.data.user + " --password " + this.data.passwd;
 	}
 	
 	if (argv4) {
