@@ -63,8 +63,47 @@ onvifc.prototype.init = function (input) {
 onvifc.prototype.autoScan = function(input){
 	var this_wrapper = this;
 	
+	var cams = {};
+	
+	onvif.Discovery.on('device', function(cam, remoteInfo, responseXML){
+	
+		console.log("CAM - typeof: " + typeof(cam) + " - content - "); console.log(cam);
+		console.log("RemoteInfo - typeof: " + typeof(remoteInfo) + " - content - "); console.log(remoteInfo);
+		console.log("XML - typeof: " + typeof(responseXML) + " - content - "); console.log(""+responseXML);
+		
+		//~ { probeMatches: 
+   //~ { probeMatch: 
+      //~ { endpointReference: [Object],
+        //~ types: 'dn:NetworkVideoTransmitter',
+        //~ scopes: 'onvif://www.onvif.org/name/IP-Camera onvif://www.onvif.org/hardware/Device_0a onvif://www.onvif.org/type/video_encoder onvif://www.onvif.org/type/audio_encoder onvif://www.onvif.org/location/ ',
+        //~ XAddrs: 'http://10.32.1.102:80/onvif/device_service',
+        //~ metadataVersion: 1030 } } }
+
+		
+		var scopes = cam.probeMatches.probeMatch.scopes.split(' ');
+		var address = cam.probeMatches.probeMatch.XAddrs.split('/')[2];
+		var camData = {
+			"IP" : address.split(':')[0],
+			"Port" : address.split(':')[1],
+			"endpointReference": cam.probeMatches.probeMatch.endpointReference,
+			"Type": cam.probeMatches.probeMatch.types.split(':')[1],
+			"Scopes": scopes,
+			"Path": cam.probeMatches.probeMatch.XAddrs
+		};
+		
+		cams[address] = (camData);
+	});
+	
+	
+	onvif.Discovery.probe({resolve: false}, function () {
+		
+		input.onDone( Object.keys(cams).map(function(address) { return cams[address]; }) );
+	});
+	
+	
+	/*
 	discovery.probe(function(_null, rinfo){
-		var cams = [];
+		
 		rinfo.forEach(function(cam){
 			var ip = cam.hostname;
 			var found = 0;
@@ -135,6 +174,7 @@ onvifc.prototype.autoScan = function(input){
 
 		});
 	});
+	*/
 };
 
 onvifc.prototype.getScopes = function (input) {
