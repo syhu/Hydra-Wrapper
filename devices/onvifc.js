@@ -35,6 +35,7 @@ var exec = require('child_process').exec;
 var Cam = require('onvif').Cam;
 var discovery = require('onvif').Discovery;
 var http = require('http');
+var onvif = require('onvif');
 //~ var child;
 
 //var obj = {};
@@ -80,14 +81,21 @@ onvifc.prototype.autoScan = function(input){
         //~ metadataVersion: 1030 } } }
 
 		
-		var scopes = cam.probeMatches.probeMatch.scopes.split(' ');
+		var scopes = cam.probeMatches.probeMatch.scopes.toString().split(' ');
+		console.log("111111");
+		console.log(scopes);
+		var scopes_obj = {};
+		Object.keys(scopes).forEach(function(key){
+			var f = scopes[key].split('/')[3], b = scopes[key].split('/')[4];
+			scopes_obj[f] = b;
+		});
 		var address = cam.probeMatches.probeMatch.XAddrs.split('/')[2];
 		var camData = {
 			"IP" : address.split(':')[0],
 			"Port" : address.split(':')[1],
 			"endpointReference": cam.probeMatches.probeMatch.endpointReference,
 			"Type": cam.probeMatches.probeMatch.types.split(':')[1],
-			"Scopes": scopes,
+			"Scopes": scopes_obj,
 			"Path": cam.probeMatches.probeMatch.XAddrs
 		};
 		
@@ -888,7 +896,7 @@ onvifc.prototype.execute = function (operation, ip, argv4, onDone, onFail) {
 	} else {
 		switch (process.platform) {
 			case 'linux':
-				command = '../../../../connector/onvif/onvifc ';
+				command = './connector/onvif/onvifc ';
 			break;
 			
 			case 'win32':
