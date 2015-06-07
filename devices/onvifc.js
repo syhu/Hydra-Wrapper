@@ -62,6 +62,7 @@ onvifc.prototype.init = function (input) {
 
 onvifc.prototype.autoScan = function(input){
 	var this_wrapper = this;
+	
 	discovery.probe(function(_null, rinfo){
 		var cams = [];
 		rinfo.forEach(function(cam){
@@ -139,6 +140,17 @@ onvifc.prototype.autoScan = function(input){
 
 		});
 	});
+};
+
+onvifc.prototype.getScopes = function (input) {
+	this.execute(
+		'GetScopes',
+		'',
+		'',
+		input.onDone,
+		input.onFail
+	);
+	
 };
 
 //顯示目前所有 ipcam 狀態
@@ -834,7 +846,7 @@ onvifc.prototype.execute = function (operation, ip, argv4, onDone, onFail) {
 	} else {
 		switch (process.platform) {
 			case 'linux':
-				command = './connector/onvif/onvifc ';
+				command = '../../../../connector/onvif/onvifc ';
 			break;
 			
 			case 'win32':
