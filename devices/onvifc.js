@@ -886,7 +886,8 @@ onvifc.prototype.execute = function (operation, ip, argv4, onDone, onFail) {
 	var wrapper_data = this.data;
 	var targetIP, targetPort;
 	if (ip) {	// 1.2.3.4:80
-		(targetIP, targetPort) = split(/:/,ip);
+		targetIP = split(/:/,ip)[0];
+		targetPort = split(/:/,ip)[1];
 	} else {
 		targetIP = this.data.host;
 		targetPort = this.data.port;

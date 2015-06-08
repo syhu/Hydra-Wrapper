@@ -1,5 +1,5 @@
 var fs = require("fs");
-var demosite = JSON.parse(fs.readFileSync("../../../../connector/onvif/test/demosite.json", "utf8"));
+//var demosite = JSON.parse(fs.readFileSync("../../../../connector/onvif/test/demosite.json", "utf8"));
 
 test = function (input) {
 	var self = this;
@@ -27,8 +27,8 @@ test = function (input) {
 		"onFail": onFail,
 		"onNotify": onNotify,
 		"device_type": "onvif",
-		"host": demosite.host,
-		"port": demosite.port,
+		//"host": demosite.host,
+		//"port": demosite.port,
 //		"user": demosite.user,
 //		"passwd": demosite.passwd
 	};
