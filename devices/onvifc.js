@@ -71,19 +71,12 @@ onvifc.prototype.autoScan = function(input){
 		console.log("CAM - typeof: " + typeof(cam) + " - content - "); console.log(cam);
 		console.log("RemoteInfo - typeof: " + typeof(remoteInfo) + " - content - "); console.log(remoteInfo);
 		console.log("XML - typeof: " + typeof(responseXML) + " - content - "); console.log(""+responseXML);
-		
-		//~ { probeMatches: 
-   //~ { probeMatch: 
-      //~ { endpointReference: [Object],
-        //~ types: 'dn:NetworkVideoTransmitter',
-        //~ scopes: 'onvif://www.onvif.org/name/IP-Camera onvif://www.onvif.org/hardware/Device_0a onvif://www.onvif.org/type/video_encoder onvif://www.onvif.org/type/audio_encoder onvif://www.onvif.org/location/ ',
-        //~ XAddrs: 'http://10.32.1.102:80/onvif/device_service',
-        //~ metadataVersion: 1030 } } }
 
-		
-		var scopes = cam.probeMatches.probeMatch.scopes.toString().split(' ');
-		console.log("111111");
-		console.log(scopes);
+		var myScopes = cam.probeMatches.probeMatch.scopes;
+		if (myScopes._) {
+			myScopes = myScopes._
+		}
+		var scopes = myScopes.toString().split(' ');
 		var scopes_obj = {};
 		Object.keys(scopes).forEach(function(key){
 			var f = scopes[key].split('/')[3], b = scopes[key].split('/')[4];
