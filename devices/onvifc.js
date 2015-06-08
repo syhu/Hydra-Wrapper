@@ -80,12 +80,23 @@ onvifc.prototype.autoScan = function(input){
 		var scopes_obj = {};
 		Object.keys(scopes).forEach(function(key){
 			var f = scopes[key].split('/')[3], b = scopes[key].split('/')[4];
-			scopes_obj[f] = b;
+			
+			if (scopes_obj[f]) {
+				scopes_obj[f] += (" " + b);
+			} else {
+				scopes_obj[f] = b;
+			}
 		});
+		
 		var address = cam.probeMatches.probeMatch.XAddrs.split('/')[2];
+		var [ip, port] = address.split(':');
+		if ( ip && typeof port == 'undefined') {
+			port = 80
+		}
+		
 		var camData = {
-			"IP" : address.split(':')[0],
-			"Port" : address.split(':')[1],
+			"IP" : ip,
+			"Port" : port,
 			"endpointReference": cam.probeMatches.probeMatch.endpointReference,
 			"Type": cam.probeMatches.probeMatch.types.split(':')[1],
 			"Scopes": scopes_obj,
