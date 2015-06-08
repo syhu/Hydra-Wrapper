@@ -89,18 +89,17 @@ onvifc.prototype.autoScan = function(input){
 		});
 		
 		var address = cam.probeMatches.probeMatch.XAddrs.split('/')[2];
-		var [ip, port] = address.split(':');
-		if ( ip && typeof port == 'undefined') {
-			port = 80
-		}
-		
 		var camData = {
-			"IP" : ip,
-			"Port" : port,
+			"IP" : address.split(':')[0],
+			"Port" : address.split(':')[1],
 			"endpointReference": cam.probeMatches.probeMatch.endpointReference,
 			"Type": cam.probeMatches.probeMatch.types.split(':')[1],
 			"Scopes": scopes_obj,
 			"Path": cam.probeMatches.probeMatch.XAddrs
+		};
+		
+		if ( camData.IP && typeof camData.Port == 'undefined') {
+			camData.Port = 80
 		};
 		
 		cams[address] = (camData);
