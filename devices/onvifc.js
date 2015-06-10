@@ -306,6 +306,7 @@ onvifc.prototype.getVideoEncoderConfigurations = function (input) {
 		input.onDone,
 		input.onFail
 	);
+	
 };
 
 onvifc.prototype.getImagingSettings = function (input) {
@@ -375,6 +376,7 @@ onvifc.prototype.setImagingSettings = function (input) {
 };
 
 onvifc.prototype.getVideoEncoderConfiguration = function (input) {
+/*
 	var token, argv4, this_wrapper = this;
 	var local_obj = {
 		onFail: input.onFail
@@ -396,6 +398,25 @@ onvifc.prototype.getVideoEncoderConfiguration = function (input) {
 	};
 
 	this_wrapper.getVideoEncoderConfigurations(local_obj);
+*/
+	var this_wrapper = this;
+
+	new Cam(
+		{
+			hostname: this_wrapper.data.host,
+			port: this_wrapper.data.port,
+			username: this_wrapper.data.user,
+			password: this_wrapper.data.passwd
+		},function(err){
+			this.getVideoEncoderConfigurations(function(err, stream){
+				if(input.channel == "ch_0") {
+					input.onDone(stream[0]);
+				} else {
+					input.onDone(stream[1]);
+				}
+			});
+		}
+	);
 	
 };
 
