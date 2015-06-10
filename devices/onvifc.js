@@ -245,8 +245,8 @@ onvifc.prototype.getDeviceInformation = function(input){
 		path: ''
 	};
 	//if http response, do get device info
-	http.get(options, function(res){
-		res.on('data', function(data){
+//	http.get(options, function(res){
+//		res.on('data', function(data){
 			new Cam(
 				{
 					hostname: this_wrapper.data.host,
@@ -278,14 +278,14 @@ onvifc.prototype.getDeviceInformation = function(input){
 					});
 				}
 			);
-		}).on('end', function(){
-			})
+//		}).on('end', function(){
+//			})
 		//if on error
-	}).on('error', function(){
+/*	}).on('error', function(){
 		input.onFail({
 			"Error" : "check your IP!"	
 		});
-	});
+	});*/
 };
 
 onvifc.prototype.getVideoSources = function (input) {
