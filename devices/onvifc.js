@@ -316,7 +316,8 @@ onvifc.prototype.getImagingSettings = function (input) {
 	};
 
 	local_obj.onDone = function(RET) {
-		token = RET.GetVideoSources.VideoSources["token"];
+		getToken = RET.GetVideoSources.VideoSources["token"];
+/*
 		argv4 = " --Channel " + token;
 
 		this_wrapper.execute(
@@ -325,6 +326,20 @@ onvifc.prototype.getImagingSettings = function (input) {
 			argv4,
 			input.onDone,
 			local_obj.onFail
+		);
+*/
+		new Cam (
+		{
+			hostname: this_wrapper.data.host,
+			port: this_wrapper.data.port,
+			username: this_wrapper.data.user,
+			password: this_wrapper.data.passwd
+			
+		}, function (err) {
+				this.getImagingSettings({token: getToken}, function(err, stream){
+					input.onDone(stream);	
+				});
+			}
 		);
 	};
 
