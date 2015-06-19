@@ -370,6 +370,33 @@ onvifc.prototype.setImagingSettings = function (input) {
 	};
 
 	local_obj.onDone = function(RET) {
+		var imagSet = {};
+		imagSet.token = RET.$["token"];
+
+		Object.keys(input).forEach ( function (key) {
+			if(key !== 'channel' && key !== 'onDone' && key !== 'onFail') {
+				imagSet[key] = input[key];
+			}
+		});
+
+//		console.log("ImagSet");
+//		console.log(imagSet);
+
+		new Cam (
+		{
+			hostname: this_wrapper.data.host,
+			port: this_wrapper.data.port,
+			username: this_wrapper.data.user,
+			password: this_wrapper.data.passwd
+			
+		}, function (err) {
+				this.setImagingSettings(imagSet, function(err, stream){
+					input.onDone(stream);	
+				});
+			}
+		);
+		
+/*
 		if(!(typeof(input.brightness) === "undefined"))
 			if(typeof(argv4) !== "undefined")
 				argv4 += " --Brightness " + input.brightness;
@@ -400,6 +427,7 @@ onvifc.prototype.setImagingSettings = function (input) {
 			input.onDone,
 			local_obj.onFail
 		);
+*/
 	};
 
 	this_wrapper.getVideoSources(local_obj);

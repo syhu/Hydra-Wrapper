@@ -22,7 +22,7 @@ test = function (input) {
 		"onFail": onFail,
 //		4A至少要有一個,若不設定可以不給
 		"brightness": 200,
-		"colorsaturation": 100,
+		"colorSaturation": 100,
 		"contrast": 150,
 		"sharpness": 200,
 		"channel": "ch_1"
