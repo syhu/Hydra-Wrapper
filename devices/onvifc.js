@@ -289,12 +289,28 @@ onvifc.prototype.getDeviceInformation = function(input){
 };
 
 onvifc.prototype.getVideoSources = function (input) {
+/*
 	this.execute(
 		'GetVideoSources',
 		'',
 		'',
 		input.onDone,
 		input.onFail
+	);
+*/
+	var this_wrapper = this;
+	new Cam (
+	{
+		hostname: this_wrapper.data.host,
+		port: this_wrapper.data.port,
+		username: this_wrapper.data.user,
+		password: this_wrapper.data.passwd
+		
+	}, function (err) {
+			this.getVideoSources(function(err, stream){
+				input.onDone(stream);	
+			});
+		}
 	);
 };
 
@@ -316,7 +332,7 @@ onvifc.prototype.getImagingSettings = function (input) {
 	};
 
 	local_obj.onDone = function(RET) {
-		getToken = RET.GetVideoSources.VideoSources["token"];
+		getToken = RET.$["token"];
 /*
 		argv4 = " --Channel " + token;
 
