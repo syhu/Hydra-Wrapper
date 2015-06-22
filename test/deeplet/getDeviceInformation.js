@@ -5,8 +5,12 @@ test = function (input) {
 	var self = this;
 	var onDone = function (response) {
 		console.log("onDone");
-		if (typeof(response) !== "undefined")
+		if (typeof(response) !== "undefined") {
 			console.log(response);
+		}
+		if (typeof(response._cameras.ch) !== "undefined") {
+			console.log(response._cameras.ch[0].Title);
+		}
 	}
 	var onError = function (response) {
 		console.log("onError");

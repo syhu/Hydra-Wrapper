@@ -232,23 +232,36 @@ deeplet.prototype.getHardwareInfo = function (input) {
 
 // todo: 可以有精簡模式(model,serial number) 及 全部詳細模式 
 deeplet.prototype.getDeviceInformation = function (input) {
+	var self = this;
 	this.checkCallbacks(input);
 	var normalizedHardwareInfo = {};
 	var local_obj= {};
 
 	var get_info = {};
-	
+
+	var get_cameras = {};
+
+	get_cameras.onFail = input.onFail;
+
+	get_cameras.onDone = function (ret) {
+		normalizedHardwareInfo._cameras = ret;
+		input.onDone(normalizedHardwareInfo);
+	}
+
 	get_info.onDone = function (ret) {
 		normalizedHardwareInfo = {
 			"Model" : ret.Model,
 			"Serial" : ret.Serial,
 			"Version" : ret.SWVersion,
 			"Screens": ret.Screens,
+			"_info": ret,
+			"_cameras": {}
 		};
-		if (input.verbose == true) {
+		/*if (input.verbose == true) {
 			normalizedHardwareInfo.verbose = ret;
-		}
-		input.onDone(normalizedHardwareInfo);
+		}*/
+		// input.onDone(normalizedHardwareInfo);
+		self.dvr_connector.get_mem_info_cameras(get_cameras);
 	}
 	get_info.onFail = input.onFail;
 	this.dvr_connector.info(get_info);
