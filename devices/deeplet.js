@@ -232,23 +232,36 @@ deeplet.prototype.getHardwareInfo = function (input) {
 
 // todo: 可以有精簡模式(model,serial number) 及 全部詳細模式 
 deeplet.prototype.getDeviceInformation = function (input) {
+	var self = this;
 	this.checkCallbacks(input);
 	var normalizedHardwareInfo = {};
 	var local_obj= {};
 
 	var get_info = {};
-	
+
+	var get_cameras = {};
+
+	get_cameras.onFail = input.onFail;
+
+	get_cameras.onDone = function (ret) {
+		normalizedHardwareInfo._cameras = ret;
+		input.onDone(normalizedHardwareInfo);
+	}
+
 	get_info.onDone = function (ret) {
 		normalizedHardwareInfo = {
 			"Model" : ret.Model,
 			"Serial" : ret.Serial,
 			"Version" : ret.SWVersion,
 			"Screens": ret.Screens,
+			"_info": ret,
+			"_cameras": {}
 		};
-		if (input.verbose == true) {
+		/*if (input.verbose == true) {
 			normalizedHardwareInfo.verbose = ret;
-		}
-		input.onDone(normalizedHardwareInfo);
+		}*/
+		// input.onDone(normalizedHardwareInfo);
+		self.dvr_connector.get_mem_info_cameras(get_cameras);
 	}
 	get_info.onFail = input.onFail;
 	this.dvr_connector.info(get_info);
@@ -1196,6 +1209,51 @@ deeplet.prototype.setPrivacyMasks = function (input) {
 deeplet.prototype.updateaddmeminfo = function (input) {
 	this.checkCallbacks(input);
 	this.dvr_connector.update_addmem_info(input);
+}
+
+deeplet.prototype.getCameraSettings = function (input) {
+	var self = this;
+	this.checkCallbacks(input);
+
+	/*var update = function (QAQ) {
+		self.dvr_connector.update_mem_info({"onDone": input.onDone, "onFail": input.onFail});
+	}*/
+
+	var cameras = {
+		"onDone": input.onDone,
+		"onFail": input.onFail
+	}
+	this.dvr_connector.get_mem_info_cameras(cameras);
+}
+
+deeplet.prototype.setCameraSettings = function (input) {
+	var self = this;
+	this.checkCallbacks(input);
+
+	if (typeof(input.ch) === "undefined") {
+		input.ch = 0; // default
+		LOG.warn("set default channel to 0");
+	}
+
+	if (typeof(input.Title) === "undefined") {
+		input.Title = "海德拉"; // default
+		LOG.warn("set default Title to 海德拉");
+	}
+
+	var update = function (QAQ) {
+		self.dvr_connector.update_mem_info({"onDone": input.onDone, "onFail": input.onFail});
+	}
+
+	var set_camera = function (response) {
+		response.ch[input.ch].Title = input.Title;
+		self.dvr_connector.set_mem_info_cameras({"onDone": update, "onFail": input.onFail, "data": response});
+	}
+
+	var cameras = {
+		"onDone": set_camera,
+		"onFail": input.onFail
+	}
+	this.dvr_connector.get_mem_info_cameras(cameras);
 }
 
 // 回傳 network settings: executable

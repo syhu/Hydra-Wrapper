@@ -5,15 +5,11 @@ test = function (input) {
 	var self = this;
 	var onDone = function (response) {
 		console.log("onDone");
-		if (typeof(response) !== "undefined") {
+		if (typeof(response) !== "undefined")
 			console.log(response);
-		}
-		if (typeof(response._cameras.ch) !== "undefined") {
-			console.log(response._cameras.ch[0].Title);
-		}
 	}
-	var onError = function (response) {
-		console.log("onError");
+	var onFail = function (response) {
+		console.log("onFail");
 		console.log(response);
 	}
 	var onNotify = function (response) {
@@ -21,14 +17,14 @@ test = function (input) {
 		console.log(response);
 	}
 
-	var getDevInfo = {
+	var camera = {
+		"ch": 0,
 		"onDone": onDone,
-		"onError": onError
-	};
+		"onFail": onFail
+	}
 
 	var setup = {
-		"onDone": onDone,
-		"onError": onError,
+		"onFail": onFail,
 		"onNotify": onNotify,
 		"device_type": "deeplet",
 		"host": demosite.host,
@@ -38,7 +34,7 @@ test = function (input) {
 	};
 
 	setup.onDone = function (response) {
-		self.wrapper.getDeviceInformation(getDevInfo);
+		self.wrapper.getCameraSettings(camera);
 	};
 
 	var wrapper = require("../../wrapper.js");
