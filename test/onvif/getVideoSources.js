@@ -20,7 +20,6 @@ test = function (input) {
 	var getDevInfo = {
 		"onDone": onDone,
 		"onFail": onFail,
-		"channel": "ch_1"
 	};
 
 	var setup = {
@@ -40,7 +39,7 @@ test = function (input) {
 	var wrapper = require("../../wrapper.js");
 	this.wrapper = new wrapper();
 	this.wrapper.setup(setup);
-	this.wrapper.getVideoEncoderConfiguration(getDevInfo);
+	this.wrapper.getVideoSources(getDevInfo);
 
 /*	while (typeof(this.wrapper.getDeviceInformation) === "undefined") {
 		if (typeof(this.wrapper.getDeviceInformation) !== "undefined") {

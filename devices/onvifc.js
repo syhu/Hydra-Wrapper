@@ -35,6 +35,7 @@ var exec = require('child_process').exec;
 var Cam = require('onvif').Cam;
 var discovery = require('onvif').Discovery;
 var http = require('http');
+var onvif = require('onvif');
 //~ var child;
 
 //var obj = {};
@@ -61,25 +62,141 @@ onvifc.prototype.init = function (input) {
 };
 
 onvifc.prototype.autoScan = function(input){
+	var this_wrapper = this;
+	
+	var cams = {};
+	
+	onvif.Discovery.on('device', function(cam, remoteInfo, responseXML){
+	
+		console.log("CAM - typeof: " + typeof(cam) + " - content - "); console.log(cam);
+		console.log("RemoteInfo - typeof: " + typeof(remoteInfo) + " - content - "); console.log(remoteInfo);
+		console.log("XML - typeof: " + typeof(responseXML) + " - content - "); console.log(""+responseXML);
+
+		var myScopes = cam.probeMatches.probeMatch.scopes;
+		if (myScopes._) {
+			myScopes = myScopes._
+		}
+		var scopes = myScopes.toString().split(' ');
+		var scopes_obj = {};
+		Object.keys(scopes).forEach(function(key){
+			var f = scopes[key].split('/')[3], b = scopes[key].split('/')[4];
+			
+			if (scopes_obj[f]) {
+				scopes_obj[f] += (" " + b);
+			} else {
+				scopes_obj[f] = b;
+			}
+		});
+		
+		var address = cam.probeMatches.probeMatch.XAddrs.split('/')[2];
+		var camData = {
+			"IP" : address.split(':')[0],
+			"Port" : address.split(':')[1],
+			"endpointReference": cam.probeMatches.probeMatch.endpointReference,
+			"Type": cam.probeMatches.probeMatch.types.split(':')[1],
+			"Scopes": scopes_obj,
+			"Path": cam.probeMatches.probeMatch.XAddrs
+		};
+		
+		if ( camData.IP && typeof camData.Port == 'undefined') {
+			camData.Port = 80
+		};
+		
+		cams[address] = (camData);
+	});
+	
+	
+	onvif.Discovery.probe({resolve: false}, function () {
+		
+		input.onDone( Object.keys(cams).map(function(address) { return cams[address]; }) );
+	});
+	
+	
+	/*
 	discovery.probe(function(_null, rinfo){
-		var cams = [];
+		
 		rinfo.forEach(function(cam){
-			cams.push({
+			var ip = cam.hostname;
+			var found = 0;
+			cams.forEach(function(outcam){
+				if(outcam.hostname == ip) {
+					found = 1;
+				}
+			});
+
+			if(!found) {
+				cams.push(cam);
+			}
+		});
+
+		console.log(typeof(cams));
+		var outputs = [];
+		var camCount = cams.length;
+		cams.forEach(function (cam) {
+			var thisCam = cam;
+			var output = {
 				"IP" : cam.hostname,
 				"Port" : cam.port,
 				"Path" : cam.path
+			};
+
+			var checkEmpty = 0;
+			
+			
+			this_wrapper.getScopes({
+				address: thisCam.hostname + ":" + thisCam.port,
+				onDone: function (scopes) {
+					cam.getDeviceInformation(function(err, stream) {
+						
+						console.log(camCount);
+						console.log(stream);
+						
+						output.scopes = scopes;
+						
+						if(typeof(stream) === "undefined" ) {
+							checkEmpty = 1;
+						} else {
+							output.Manufacturer = stream.manufacturer;
+							output.Model = stream.model;
+							output.Serial = stream.serial;
+							output.Version = stream.version;
+						}
+						if(checkEmpty) {
+							output.check = 0;
+							outputs.push(output);
+						} else {
+							output.check = 1;
+							outputs.push(output);
+						}
+						if(typeof(outputs) === "undefined"){
+							input.onFail({
+								"Error": "NO response"
+							});
+						} else{
+							console.log("Finalllllllllllllllllllllllllllllllllll");
+							console.log(outputs);
+							if(0 == --camCount) {
+								input.onDone(outputs);
+							}
+						}
+					});
+				}
 			});
+
 		});
-		console.log(typeof(cams));
-		if(cams == null){
-			input.onFail({
-				"Error": "NO IPCams"
-			});
-		} else{
-			input.onDone(cams);
-			console.log(cams);
-			}
 	});
+	*/
+};
+
+onvifc.prototype.getScopes = function (input) {
+	this.execute(
+		'GetScopes',
+		'',
+		'',
+		input.onDone,
+		input.onFail
+	);
+	
 };
 
 //顯示目前所有 ipcam 狀態
@@ -93,6 +210,32 @@ onvifc.prototype.exit = function(input){
 	input.onDone("GG");
 }
 
+onvifc.prototype.getStreamUri = function(input){
+	var this_wrapper = this;
+	//for error ip input
+	var options = {
+		host: this.data.host,
+		port: 80,
+		path: ''
+	};
+
+	new Cam(
+		{
+			hostname: this_wrapper.data.host,
+			port: this_wrapper.data.port,
+			username: this_wrapper.data.user,
+			password: this_wrapper.data.passwd
+		},function(err){
+			this.getStreamUri(function(err, stream){
+				input.onDone({
+					"uristream" : stream
+				});
+			});
+		}
+	);
+	
+}
+
 onvifc.prototype.getDeviceInformation = function(input){
 	var this_wrapper = this;
 	//for error ip input
@@ -102,8 +245,8 @@ onvifc.prototype.getDeviceInformation = function(input){
 		path: ''
 	};
 	//if http response, do get device info
-	http.get(options, function(res){
-		res.on('data', function(data){
+//	http.get(options, function(res){
+//		res.on('data', function(data){
 			new Cam(
 				{
 					hostname: this_wrapper.data.host,
@@ -114,10 +257,12 @@ onvifc.prototype.getDeviceInformation = function(input){
 					this.getDeviceInformation(function(err, stream){
 						var Uri_stream;
 		 				var cam_this = this;
-						cam_this.getStreamUri({profileToken:'Stream_1'},function(err, uri){
+						cam_this.getStreamUri(function(err, uri){
 							Uri_stream = uri;
-							if(stream !== null && uri !== null){
+							if(typeof(stream) !== "undefined" && typeof(uri) !== "undefined"){
+								console.log(stream);
 								input.onDone({
+									"Manufacturer" : stream.manufacturer,
 									"Model" : stream.model,
 									"Serial" : stream.serialNumber,
 									"Version" : stream.firmwareVersion,
@@ -133,131 +278,256 @@ onvifc.prototype.getDeviceInformation = function(input){
 					});
 				}
 			);
-		}).on('end', function(){
-			})
+//		}).on('end', function(){
+//			})
 		//if on error
-	}).on('error', function(){
+/*	}).on('error', function(){
 		input.onFail({
 			"Error" : "check your IP!"	
 		});
-	});
+	});*/
 };
 
-onvifc.prototype.getImagingSettings = function (input) {
-	var token, argv4;
-	//FIXME need to find token
-	if(input.channel == "ch_1")	token = "H264_0";
-	else token = "H264_0";
-	argv4 = " --Channel " + token;
-
+onvifc.prototype.getVideoSources = function (input) {
+/*
 	this.execute(
-		'GetImagingSettings',
+		'GetVideoSources',
 		'',
-		argv4,
+		'',
 		input.onDone,
 		input.onFail
 	);
+*/
+	var this_wrapper = this;
+	new Cam (
+	{
+		hostname: this_wrapper.data.host,
+		port: this_wrapper.data.port,
+		username: this_wrapper.data.user,
+		password: this_wrapper.data.passwd
+		
+	}, function (err) {
+			this.getVideoSources(function(err, stream){
+				input.onDone(stream);	
+			});
+		}
+	);
+};
+
+onvifc.prototype.getVideoEncoderConfigurations = function (input) {
+	this.execute(
+		'GetVideoEncoderConfigurations',
+		'',
+		'',
+		input.onDone,
+		input.onFail
+	);
+	
+};
+
+onvifc.prototype.getImagingSettings = function (input) {
+	var token, argv4, this_wrapper = this;
+	var local_obj = {
+		onFail: input.onFail
+	};
+
+	local_obj.onDone = function(RET) {
+		getToken = RET.$["token"];
+/*
+		argv4 = " --Channel " + token;
+
+		this_wrapper.execute(
+			'GetImagingSettings',
+			'',
+			argv4,
+			input.onDone,
+			local_obj.onFail
+		);
+*/
+		new Cam (
+		{
+			hostname: this_wrapper.data.host,
+			port: this_wrapper.data.port,
+			username: this_wrapper.data.user,
+			password: this_wrapper.data.passwd
+			
+		}, function (err) {
+				this.getImagingSettings({token: getToken}, function(err, stream){
+					input.onDone(stream);	
+				});
+			}
+		);
+	};
+
+	this_wrapper.getVideoSources(local_obj);
 	
 };
 
 onvifc.prototype.setImagingSettings = function (input) {
-	var token, argv4;
-	console.log("11111111111111111111111111111111");
-	console.log(argv4);
-	//FIXME need to find token
-	if(input.channel == "ch_1")	token = "H264_0";
-	else token = "H264_0";
+	var token, argv4, this_wrapper = this;
+	var local_obj = {
+		onFail: input.onFail
+	};
 
-	console.log("a2222222222222222222222222");
-	console.log(argv4);
-	if(!(typeof(input.brightness) === "undefined"))
-		if(typeof(argv4) !== "undefined")
-			argv4 += " --Brightness " + input.brightness;
-		else	argv4 = " --Brightness " + input.brightness;
+	local_obj.onDone = function(RET) {
+		var imagSet = {};
+		imagSet.token = RET.$["token"];
+
+		Object.keys(input).forEach ( function (key) {
+			if(key !== 'channel' && key !== 'onDone' && key !== 'onFail') {
+				imagSet[key] = input[key];
+			}
+		});
+
+//		console.log("ImagSet");
+//		console.log(imagSet);
+
+		new Cam (
+		{
+			hostname: this_wrapper.data.host,
+			port: this_wrapper.data.port,
+			username: this_wrapper.data.user,
+			password: this_wrapper.data.passwd
+			
+		}, function (err) {
+				this.setImagingSettings(imagSet, function(err, stream){
+					input.onDone(stream);	
+				});
+			}
+		);
+		
+/*
+		if(!(typeof(input.brightness) === "undefined"))
+			if(typeof(argv4) !== "undefined")
+				argv4 += " --Brightness " + input.brightness;
+			else	argv4 = " --Brightness " + input.brightness;
 	
-	if(!(typeof(input.colorsaturation) === "undefined"))
-		if(typeof(argv4) !== "undefined")
-			argv4 += " --ColorSaturation " + input.colorsaturation;
-		else	argv4 = " --ColorSaturation " + input.colorsaturation;
+		if(!(typeof(input.colorsaturation) === "undefined"))
+			if(typeof(argv4) !== "undefined")
+				argv4 += " --ColorSaturation " + input.colorsaturation;
+			else	argv4 = " --ColorSaturation " + input.colorsaturation;
 
-	if(!(typeof(input.contrast) === "undefined"))
-		if(typeof(argv4) !== "undefined")
-			argv4 += " --Contrast " + input.contrast;
-		else	argv4 = " --Contrast " + input.contrast;
+		if(!(typeof(input.contrast) === "undefined"))
+			if(typeof(argv4) !== "undefined")
+				argv4 += " --Contrast " + input.contrast;
+			else	argv4 = " --Contrast " + input.contrast;
 
-	if(!(typeof(input.sharpness) === "undefined"))
-		if(typeof(argv4) !== "undefined")
-			argv4 += " --Sharpness " + input.sharpness;
-		else	argv4 = " --Sharpness " + input.sharpness;
+		if(!(typeof(input.sharpness) === "undefined"))
+			if(typeof(argv4) !== "undefined")
+				argv4 += " --Sharpness " + input.sharpness;
+			else	argv4 = " --Sharpness " + input.sharpness;
 
-	argv4 += " --Channel " + token;
-	console.log("33333333333333333333333333333333");
-	console.log(argv4);
-	this.execute(
-		'SetImagingSettings',
-		'',
-		argv4,
-		input.onDone,
-		input.onFail
-	);
+		token = RET.GetVideoSources.VideoSources["token"];
+		argv4 += " --Channel " + token;
+
+		this_wrapper.execute(
+			'SetImagingSettings',
+			'',
+			argv4,
+			input.onDone,
+			local_obj.onFail
+		);
+*/
+	};
+
+	this_wrapper.getVideoSources(local_obj);
 	
 };
 
 onvifc.prototype.getVideoEncoderConfiguration = function (input) {
-	var source, argv4;
-	//FIXME need to find source
-	if(input.channel == "ch_1")	source = "Encoder_H264_1";
-	else source = "Encoder_H264_0";
-	
-	argv4 = " --EncoderChannel " + source;
-	this.execute(
-		'GetVideoEncoderConfiguration',
-		'',
-		argv4,
-		input.onDone,
-		input.onFail
+/*
+	var token, argv4, this_wrapper = this;
+	var local_obj = {
+		onFail: input.onFail
+	};
+
+	local_obj.onDone = function(RET) {
+		if(input.channel == "ch_0")
+			token = RET.token0;
+		else token = RET.token1;
+		argv4 = " --EncoderChannel " + token;
+
+		this_wrapper.execute(
+			'GetVideoEncoderConfiguration',
+			'',
+			argv4,
+			input.onDone,
+			local_obj.onFail
+		);
+	};
+
+	this_wrapper.getVideoEncoderConfigurations(local_obj);
+*/
+	var this_wrapper = this;
+
+	new Cam(
+		{
+			hostname: this_wrapper.data.host,
+			port: this_wrapper.data.port,
+			username: this_wrapper.data.user,
+			password: this_wrapper.data.passwd
+		},function(err){
+			this.getVideoEncoderConfigurations(function(err, stream){
+				if(input.channel == "ch_0") {
+					input.onDone(stream[0]);
+				} else {
+					input.onDone(stream[1]);
+				}
+			});
+		}
 	);
 	
 };
 
 onvifc.prototype.setVideoEncoderConfiguration = function (input) {
-	var source, argv4;
-	//FIXME need to find source
-	if(input.channel == "ch_1")	source = "Encoder_H264_1";
-	else source = "Encoder_H264_0";
+	var token, argv4, this_wrapper = this;
+	var local_obj = {
+		onFail: input.onFail
+	};
+
+	local_obj.onDone = function(RET) {
+//for Encoder setting
+		if(input.framerate !== "undefined")
+			if(typeof(argv4) !== "undefined")
+				argv4 += " --FrameRate " + input.framerate;
+			else argv4 += " --FrameRate " + input.framerate;
 	
-	if(input.framerate !== "undefined")
-		if(typeof(argv4) !== "undefined")
-			argv4 += " --FrameRate " + input.framerate;
-		else argv4 += " --FrameRate " + input.framerate;
-	
-	if(input.bitrate !== "undefined")
-		if(typeof(argv4) !== "undefined")
-			argv4 += " --BitRate " + input.bitrate;
-		else argv4 += " --BitRate " + input.bitrate; 
+		if(input.bitrate !== "undefined")
+			if(typeof(argv4) !== "undefined")
+				argv4 += " --BitRate " + input.bitrate;
+			else argv4 += " --BitRate " + input.bitrate; 
 
-	if(input.quality !== "undefined")
-		if(typeof(argv4) !== "undefined")
-			argv4 += " --Quality " + input.quality;
-		else argv4 += " --Quality " + input.quality;
+		if(input.quality !== "undefined")
+			if(typeof(argv4) !== "undefined")
+				argv4 += " --Quality " + input.quality;
+			else argv4 += " --Quality " + input.quality;
 
-	if(input.resolution_width !== "undefined")
-		if(typeof(argv4) !== "undefined")
-			argv4 += " --ResolutionWidth " + input.resolution_width;
-		else argv4 += " --ResolutionWidth " + input.resolution_width;
+		if(input.resolution_width !== "undefined")
+			if(typeof(argv4) !== "undefined")
+				argv4 += " --ResolutionWidth " + input.resolution_width;
+			else argv4 += " --ResolutionWidth " + input.resolution_width;
 
-	if(input.resolution_height !== "undefined")
-		if(typeof(argv4) !== "undefined")
-			argv4 += " --ResolutionHeight " + input.resolution_height;
-		else argv4 += " --ResolutionHeight " + input.resolution_height;
-	argv4 += " --EncoderChannel " + source;
-	this.execute(
-		'SetVideoEncoderConfiguration',
-		'',
-		argv4,
-		input.onDone,
-		input.onFail
-	);
+		if(input.resolution_height !== "undefined")
+			if(typeof(argv4) !== "undefined")
+				argv4 += " --ResolutionHeight " + input.resolution_height;
+			else argv4 += " --ResolutionHeight " + input.resolution_height;
+//for channel setting
+		if(input.channel == "ch_0")
+			token = RET.token0;
+		else token = RET.token1;
+
+		argv4 += " --EncoderChannel " + token;
+
+		this_wrapper.execute(
+			'SetVideoEncoderConfiguration',
+			'',
+			argv4,
+			input.onDone,
+			local_obj.onFail
+		);
+	};
+
+	this_wrapper.getVideoEncoderConfigurations(local_obj);
 	
 };
 
@@ -694,6 +964,14 @@ onvifc.prototype.getObj = function (prop) {
 
 onvifc.prototype.execute = function (operation, ip, argv4, onDone, onFail) {
 	var wrapper_data = this.data;
+	var targetIP, targetPort;
+	if (ip) {	// 1.2.3.4:80
+		targetIP = split(/:/,ip)[0];
+		targetPort = split(/:/,ip)[1];
+	} else {
+		targetIP = this.data.host;
+		targetPort = this.data.port;
+	}
 //	var saveObj = this.saveObj;
 	
 	var command;
@@ -714,7 +992,7 @@ onvifc.prototype.execute = function (operation, ip, argv4, onDone, onFail) {
 				process.exit(99);
 			break;
 		}
-		command += "--operation " + operation + " --ip " + this.data.host + " --port " + this.data.port + " --username " + this.data.user + " --password " + this.data.passwd;
+		command += "--operation " + operation + " --ip " + targetIP + " --port " + targetPort + " --username " + this.data.user + " --password " + this.data.passwd;
 	}
 	
 	if (argv4) {

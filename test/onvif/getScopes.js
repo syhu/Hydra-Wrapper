@@ -8,8 +8,8 @@ test = function (input) {
 		if (typeof(response) !== "undefined")
 			console.log(response);
 	}
-	var onFail = function (response) {
-		console.log("onFail");
+	var onError = function (response) {
+		console.log("onError");
 		console.log(response);
 	}
 	var onNotify = function (response) {
@@ -17,15 +17,14 @@ test = function (input) {
 		console.log(response);
 	}
 
-	var getDevInfo = {
+	var getstream = {
 		"onDone": onDone,
-		"onFail": onFail,
-		"channel": "ch_1"
+		"onError": onError
 	};
 
 	var setup = {
 		"onDone": onDone,
-		"onFail": onFail,
+		"onError": onError,
 		"onNotify": onNotify,
 		"device_type": "onvif",
 		"host": demosite.host,
@@ -35,12 +34,12 @@ test = function (input) {
 	};
 
 	setup.onDone = function (response) {
+		self.wrapper.getScopes(getstream);
 	}
 
 	var wrapper = require("../../wrapper.js");
 	this.wrapper = new wrapper();
 	this.wrapper.setup(setup);
-	this.wrapper.getVideoEncoderConfiguration(getDevInfo);
 
 /*	while (typeof(this.wrapper.getDeviceInformation) === "undefined") {
 		if (typeof(this.wrapper.getDeviceInformation) !== "undefined") {

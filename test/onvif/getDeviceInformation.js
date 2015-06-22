@@ -1,5 +1,5 @@
 var fs = require("fs");
-var demosite = JSON.parse(fs.readFileSync("../../../../connector/onvif/test/demosite.json", "utf8"));
+var demosite = JSON.parse(fs.readFileSync("../../../../connector/onvif/test/demosite146.json", "utf8"));
 
 test = function (input) {
 	var self = this;
@@ -8,7 +8,7 @@ test = function (input) {
 		if (typeof(response) !== "undefined")
 			console.log(response);
 	}
-	var onError = function (response) {
+	var onFail = function (response) {
 		console.log("onError");
 		console.log(response);
 	}
@@ -19,12 +19,12 @@ test = function (input) {
 
 	var getDevInfo = {
 		"onDone": onDone,
-		"onError": onError
+		"onFail": onFail
 	};
 
 	var setup = {
 		"onDone": onDone,
-		"onError": onError,
+		"onFail": onFail,
 		"onNotify": onNotify,
 		"device_type": "onvif",
 		"host": demosite.host,
