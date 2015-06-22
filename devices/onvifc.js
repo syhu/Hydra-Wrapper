@@ -189,6 +189,7 @@ onvifc.prototype.autoScan = function(input){
 };
 
 onvifc.prototype.getScopes = function (input) {
+/*
 	this.execute(
 		'GetScopes',
 		'',
@@ -196,7 +197,21 @@ onvifc.prototype.getScopes = function (input) {
 		input.onDone,
 		input.onFail
 	);
-	
+*/
+	var this_wrapper = this;
+	new Cam(
+		{
+			hostname: this_wrapper.data.host,
+			port: this_wrapper.data.port,
+			username: this_wrapper.data.user,
+			password: this_wrapper.data.passwd
+		},function(err){
+			this.getScopes(function(err, stream){
+				input.onDone(stream);
+			});
+		}
+	);
+		
 };
 
 //顯示目前所有 ipcam 狀態
