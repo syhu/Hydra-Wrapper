@@ -1211,6 +1211,51 @@ deeplet.prototype.updateaddmeminfo = function (input) {
 	this.dvr_connector.update_addmem_info(input);
 }
 
+deeplet.prototype.getCameraSettings = function (input) {
+	var self = this;
+	this.checkCallbacks(input);
+
+	/*var update = function (QAQ) {
+		self.dvr_connector.update_mem_info({"onDone": input.onDone, "onFail": input.onFail});
+	}*/
+
+	var cameras = {
+		"onDone": input.onDone,
+		"onFail": input.onFail
+	}
+	this.dvr_connector.get_mem_info_cameras(cameras);
+}
+
+deeplet.prototype.setCameraSettings = function (input) {
+	var self = this;
+	this.checkCallbacks(input);
+
+	if (typeof(input.ch) === "undefined") {
+		input.ch = 0; // default
+		LOG.warn("set default channel to 0");
+	}
+
+	if (typeof(input.Title) === "undefined") {
+		input.Title = "海德拉"; // default
+		LOG.warn("set default Title to 海德拉");
+	}
+
+	var update = function (QAQ) {
+		self.dvr_connector.update_mem_info({"onDone": input.onDone, "onFail": input.onFail});
+	}
+
+	var set_camera = function (response) {
+		response.ch[input.ch].Title = input.Title;
+		self.dvr_connector.set_mem_info_cameras({"onDone": update, "onFail": input.onFail, "data": response});
+	}
+
+	var cameras = {
+		"onDone": set_camera,
+		"onFail": input.onFail
+	}
+	this.dvr_connector.get_mem_info_cameras(cameras);
+}
+
 // 回傳 network settings: executable
 deeplet.prototype.network = function (input) {
 	this.checkCallbacks(input);
