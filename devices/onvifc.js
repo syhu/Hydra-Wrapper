@@ -253,54 +253,71 @@ onvifc.prototype.getStreamUri = function(input){
 
 onvifc.prototype.getDeviceInformation = function(input){
 	var this_wrapper = this;
+	var local_obj = {
+		onError: input.onError
+	};
 	//for error ip input
 	var options = {
 		host: this_wrapper.data.host,
 		port: 80,
 		path: ''
 	};
-	//if http response, do get device info
-//	http.get(options, function(res){
-//		res.on('data', function(data){
-			new Cam(
-				{
-					hostname: this_wrapper.data.host,
-					port: this_wrapper.data.port,
-					username: this_wrapper.data.user,
-					password: this_wrapper.data.passwd
-				},function(err){
-					this.getDeviceInformation(function(err, stream){
-						var Uri_stream;
-		 				var cam_this = this;
-						cam_this.getStreamUri(function(err, uri){
-							Uri_stream = uri;
-							if(typeof(stream) !== "undefined" && typeof(uri) !== "undefined"){
-								console.log(stream);
-								input.onDone({
-									"Manufacturer" : stream.manufacturer,
-									"Model" : stream.model,
-									"Serial" : stream.serialNumber,
-									"Version" : stream.firmwareVersion,
-									"rtsp" : Uri_stream.uri
-								});
-							} else{
-								input.onFail({
-									"Error" : "NULL"
-								});
-							}
-						});
 
-					});
-				}
-			);
-//		}).on('end', function(){
-//			})
-		//if on error
-/*	}).on('error', function(){
-		input.onFail({
-			"Error" : "check your IP!"	
+	local_obj.onDone = function(RET) {
+		var scopes = RET.scopes;
+		var scopes_obj = {};
+
+		Object.keys(scopes).forEach(function (key) {
+			var f = scopes[key].scopeItem.split('/')[3],
+			b = scopes[key].scopeItem.split('/')[4];
+
+			if (scopes_obj[f]) {
+				scopes_obj[f] += (" " + b);
+			} else {
+				scopes_obj[f] = b;
+			}
 		});
-	});*/
+		
+		console.log("scope_obj");
+		console.log(scopes_obj);
+		new Cam(
+			{
+				hostname: this_wrapper.data.host,
+				port: this_wrapper.data.port,
+				username: this_wrapper.data.user,
+				password: this_wrapper.data.passwd
+			},function(err){
+				this.getDeviceInformation(function(err, stream){
+					var Uri_stream;
+	 				var cam_this = this;
+					cam_this.getStreamUri(function(err, uri){
+						Uri_stream = uri;
+						if(typeof(stream) !== "undefined" && typeof(uri) !== "undefined" && typeof(scopes_obj !== "undefined")){
+							console.log(stream);
+							input.onDone({
+								"Name" : scopes_obj.name,
+								"Type" : scopes_obj.type,
+								"Location" : scopes_obj.location,
+								"Harware" : scopes_obj.hardware,
+								"Manufacturer" : stream.manufacturer,
+								"Model" : stream.model,
+								"Serial" : stream.serialNumber,
+								"Version" : stream.firmwareVersion,
+								"rtsp" : Uri_stream.uri
+							});
+						} else{
+							input.onFail({
+								"Error" : "NULL"
+							});
+						}
+					});
+
+				});
+			}
+		);
+	}
+
+	this_wrapper.getScopes(local_obj);
 };
 
 onvifc.prototype.getVideoSources = function (input) {
