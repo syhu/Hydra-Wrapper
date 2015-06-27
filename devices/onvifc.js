@@ -207,7 +207,12 @@ onvifc.prototype.getScopes = function (input) {
 			password: this_wrapper.data.passwd
 		},function(err){
 			this.getScopes(function(err, stream){
-				input.onDone(stream);
+				if (stream) {
+					input.onDone(stream);
+				} else {
+					input.onFail("password error");
+				}
+			
 			});
 		}
 	);
@@ -254,7 +259,7 @@ onvifc.prototype.getStreamUri = function(input){
 onvifc.prototype.getDeviceInformation = function(input){
 	var this_wrapper = this;
 	var local_obj = {
-		onError: input.onError
+		onFail: input.onFail
 	};
 	//for error ip input
 	var options = {
