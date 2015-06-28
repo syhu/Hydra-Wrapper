@@ -219,6 +219,66 @@ onvifc.prototype.getScopes = function (input) {
 		
 };
 
+onvifc.prototype.setScopes = function (input) {
+	var this_wrapper = this;
+	local_obj = {
+		onFail : input.onFail
+	};
+
+	local_obj.onDone = function (RET) {
+		var local_obj_this = this;
+		var scopes = RET.scopes;
+		var scopes_obj = {};
+
+		var exist = 0;
+		Object.keys(scopes).forEach(function (key) {
+			if (scopes[key].scopeDef === 'Configurable') {
+				var real_key = scopes[key].scopeItem.split('/')[3],
+				real_item = scopes[key].scopeItem.split('/')[4]
+
+				var inputSet = 0;
+				Object.keys(input).forEach(function (input_key) {
+					if (input_key == real_key) {
+						scopes_obj[key] = scopes[key].scopeItem.replace(real_item, input[input_key]);
+						inputSet = 1;
+					}
+				});
+
+				if (!inputSet) {
+					scopes_obj[key] = scopes[key].scopeItem;
+				}
+
+
+				exist++;
+			}
+		});
+
+		if (!exist) {
+			this.onFail("No configurable item!!");
+		} else {
+			new Cam(
+				{
+					hostname: this_wrapper.data.host,
+					port: this_wrapper.data.port,
+					username: this_wrapper.data.user,
+					password: this_wrapper.data.passwd
+				},function(err){
+					this.setScopes(scopes_obj, function(stream){
+						if (!err) {
+							input.onDone(stream);
+						} else {
+							local_obj_this.onFail("password error");
+						}
+			
+					});
+				}
+			);
+		}
+		
+	};
+
+	this.getScopes(local_obj);
+};
 //顯示目前所有 ipcam 狀態
 onvifc.prototype.status = function (input) { 
 	LOG.warn('connector status');
