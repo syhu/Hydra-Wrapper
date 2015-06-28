@@ -238,7 +238,7 @@ onvifc.prototype.setScopes = function (input) {
 
 				var inputSet = 0;
 				Object.keys(input).forEach(function (input_key) {
-					if (input_key == real_key) {
+					if (input_key == real_key && typeof(input[input_key]) !== "undefined") {
 						scopes_obj[key] = scopes[key].scopeItem.replace(real_item, input[input_key]);
 						inputSet = 1;
 					}
