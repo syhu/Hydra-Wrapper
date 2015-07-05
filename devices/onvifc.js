@@ -356,7 +356,7 @@ onvifc.prototype.getDeviceInformation = function(input){
 	};
 
 	local_obj.onDone = function(RET) {
-		var scopes = RET.scopes;
+		var scopes = RET;
 		var scopes_obj = {};
 
 		Object.keys(scopes).forEach(function (key) {
