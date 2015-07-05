@@ -249,8 +249,10 @@ onvifc.prototype.setScopes = function (input) {
 
 	local_obj.onDone = function (RET) {
 		var local_obj_this = this;
-		var scopes = RET.scopes;
-		var scopes_obj = {};
+//		var scopes = RET.scopes;
+		var scopes = RET;
+//		var scopes_obj = {};
+		var scopes_arr = [];
 
 		var exist = 0;
 		Object.keys(scopes).forEach(function (key) {
@@ -261,13 +263,15 @@ onvifc.prototype.setScopes = function (input) {
 				var inputSet = 0;
 				Object.keys(input).forEach(function (input_key) {
 					if (input_key == real_key && typeof(input[input_key]) !== "undefined") {
-						scopes_obj[key] = scopes[key].scopeItem.replace(real_item, input[input_key]);
+//						scopes_obj[key] = scopes[key].scopeItem.replace(real_item, input[input_key]);
+						scopes_arr.push(scopes[key].scopeItem.replace(real_item, input[input_key]));
 						inputSet = 1;
 					}
 				});
 
 				if (!inputSet) {
-					scopes_obj[key] = scopes[key].scopeItem;
+//					scopes_obj[key] = scopes[key].scopeItem;
+					scopes_arr.push(scopes[key].scopeItem);
 				}
 
 
@@ -285,7 +289,8 @@ onvifc.prototype.setScopes = function (input) {
 					username: this_wrapper.data.user,
 					password: this_wrapper.data.passwd
 				},function(err){
-					this.setScopes(scopes_obj, function(stream){
+//					this.setScopes(scopes_obj, function(stream){
+					this.setScopes(scopes_arr, function(stream){
 						if (!err) {
 							input.onDone(stream);
 						} else {
@@ -351,7 +356,7 @@ onvifc.prototype.getDeviceInformation = function(input){
 	};
 
 	local_obj.onDone = function(RET) {
-		var scopes = RET;
+		var scopes = RET.scopes;
 		var scopes_obj = {};
 
 		Object.keys(scopes).forEach(function (key) {
