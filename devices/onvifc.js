@@ -282,7 +282,7 @@ onvifc.prototype.setSystemDateAndTime = function (input) {
 			username: this_wrapper.data.user,
 			password: this_wrapper.data.passwd
 		},function(err){
-			this.setSystemDateandTime(options, function(err, stream){
+			this.setSystemDateAndTime(options, function(err, stream){
 				if (stream) {
 					input.onDone(stream);
 				} else {
