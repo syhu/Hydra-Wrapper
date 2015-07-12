@@ -263,6 +263,38 @@ onvifc.prototype.getSystemDateAndTime = function (input) {
 	
 };
 
+onvifc.prototype.setSystemDateAndTime = function (input) {
+	var options = {};
+	options.dateTimeType = input.DateTimeType;
+	options.daylightSavings = input.daylightSavings;
+	options.year = input.Year;
+	options.month = input.Month;
+	options.day = input.Day;
+	options.hour = input.Hour;
+	options.minute = input.Minute;
+	options.second = input.Second;
+
+	var this_wrapper = this;
+	new Cam(
+		{
+			hostname: this_wrapper.data.host,
+			port: this_wrapper.data.port,
+			username: this_wrapper.data.user,
+			password: this_wrapper.data.passwd
+		},function(err){
+			this.setSystemDateandTime(options, function(err, stream){
+				if (stream) {
+					input.onDone(stream);
+				} else {
+					input.onFail("password error");
+				}
+			
+			});
+		}
+	);
+	
+};
+
 onvifc.prototype.setScopes = function (input) {
 	var this_wrapper = this;
 	local_obj = {
