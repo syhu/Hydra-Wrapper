@@ -250,7 +250,7 @@ onvifc.prototype.getSystemDateAndTime = function (input) {
 			username: this_wrapper.data.user,
 			password: this_wrapper.data.passwd
 		},function(err){
-			this.getSystemDateandTime(function(err, stream){
+			this.getSystemDateAndTime(function(err, stream){
 				if (stream) {
 					input.onDone(stream);
 				} else {
@@ -269,7 +269,11 @@ onvifc.prototype.setSystemDateAndTime = function (input) {
 	options.daylightSavings = input.DaylightSavings;
 	options.timezone = input.TimeZone;
 	options.year = input.Year;
-	options.month = input.Month;
+	if (input.Month == '1') {
+		options.month = '12';
+	} else {
+		options.month = input.Month - 1;
+	}
 	options.day = input.Day;
 	options.hour = input.Hour;
 	options.minute = input.Minute;
