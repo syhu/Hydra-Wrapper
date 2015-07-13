@@ -269,11 +269,7 @@ onvifc.prototype.setSystemDateAndTime = function (input) {
 	options.daylightSavings = input.DaylightSavings;
 	options.timezone = input.TimeZone;
 	options.year = input.Year;
-	if (input.Month == '1') {
-		options.month = '12';
-	} else {
-		options.month = input.Month - 1;
-	}
+	options.month = input.Month;
 	options.day = input.Day;
 	options.hour = input.Hour;
 	options.minute = input.Minute;
