@@ -389,9 +389,13 @@ onvifc.prototype.getStreamUri = function(input){
 			password: this_wrapper.data.passwd
 		},function(err){
 			this.getStreamUri(function(err, stream){
-				input.onDone({
-					"uristream" : stream
-				});
+				if(stream) {
+					input.onDone({
+						"uristream" : stream
+					});
+				} else {
+					input.onFail("password error");
+				}
 			});
 		}
 	);
@@ -435,30 +439,34 @@ onvifc.prototype.getDeviceInformation = function(input){
 				password: this_wrapper.data.passwd
 			},function(err){
 				this.getDeviceInformation(function(err, stream){
-					var Uri_stream;
-	 				var cam_this = this;
-					cam_this.getStreamUri(function(err, uri){
-						Uri_stream = uri;
-						if(typeof(stream) !== "undefined" && typeof(uri) !== "undefined" && typeof(scopes_obj !== "undefined")){
-							console.log(stream);
-							input.onDone({
-								"Name" : scopes_obj.name,
-								"Type" : scopes_obj.type,
-								"Location" : scopes_obj.location,
-								"Harware" : scopes_obj.hardware,
-								"Manufacturer" : stream.manufacturer,
-								"Model" : stream.model,
-								"Serial" : stream.serialNumber,
-								"Version" : stream.firmwareVersion,
-								"rtsp" : Uri_stream.uri
-							});
-						} else{
-							input.onFail({
-								"Error" : "NULL"
-							});
-						}
-					});
-
+					if(err) {
+						console.log(err);
+						input.onFail("password error");
+					} else {
+						var Uri_stream;
+						var cam_this = this;
+						cam_this.getStreamUri(function(err, uri){
+							Uri_stream = uri;
+							if(typeof(stream) !== "undefined" && typeof(uri) !== "undefined" && typeof(scopes_obj !== "undefined")){
+								console.log(stream);
+								input.onDone({
+									"Name" : scopes_obj.name,
+									"Type" : scopes_obj.type,
+									"Location" : scopes_obj.location,
+									"Harware" : scopes_obj.hardware,
+									"Manufacturer" : stream.manufacturer,
+									"Model" : stream.model,
+									"Serial" : stream.serialNumber,
+									"Version" : stream.firmwareVersion,
+									"rtsp" : Uri_stream.uri
+								});
+							} else{
+								input.onFail({
+									"Error" : "NULL"
+								});
+							}
+						});
+					}
 				});
 			}
 		);
@@ -487,7 +495,11 @@ onvifc.prototype.getVideoSources = function (input) {
 		
 	}, function (err) {
 			this.getVideoSources(function(err, stream){
-				input.onDone(stream);	
+				if(stream) {
+					input.onDone(stream);	
+				} else {
+					input.onFail("password error");
+				}
 			});
 		}
 	);
@@ -532,7 +544,11 @@ onvifc.prototype.getImagingSettings = function (input) {
 			
 		}, function (err) {
 				this.getImagingSettings({token: getToken}, function(err, stream){
-					input.onDone(stream);	
+					if(stream) {
+						input.onDone(stream);	
+					} else {
+						input.onFail("password error");
+					}
 				});
 			}
 		);
@@ -570,7 +586,11 @@ onvifc.prototype.setImagingSettings = function (input) {
 			
 		}, function (err) {
 				this.setImagingSettings(imagSet, function(err, stream){
-					input.onDone(stream);	
+					if(stream) {
+						input.onDone(stream);
+					} else {
+						input.onFail("password error");
+					}
 				});
 			}
 		);
@@ -647,10 +667,14 @@ onvifc.prototype.getVideoEncoderConfiguration = function (input) {
 			password: this_wrapper.data.passwd
 		},function(err){
 			this.getVideoEncoderConfigurations(function(err, stream){
-				if(input.channel == "ch_0") {
-					input.onDone(stream[0]);
+				if(stream) {
+					if(input.channel == "ch_0") {
+						input.onDone(stream[0]);
+					} else {
+						input.onDone(stream[1]);
+					}
 				} else {
-					input.onDone(stream[1]);
+					input.onFail("password error");
 				}
 			});
 		}
