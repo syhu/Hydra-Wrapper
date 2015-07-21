@@ -241,6 +241,28 @@ onvifc.prototype.getHostname = function (input) {
 		
 };
 
+onvifc.prototype.getNTP = function (input) {
+	var this_wrapper = this;
+	new Cam(
+		{
+			hostname: this_wrapper.data.host,
+			port: this_wrapper.data.port,
+			username: this_wrapper.data.user,
+			password: this_wrapper.data.passwd
+		},function(err){
+			this.getNTP(function(err, stream){
+				if (!err) {
+					input.onDone(stream);
+				} else {
+					input.onFail("password error");
+				}
+			
+			});
+		}
+	);
+	
+};
+
 onvifc.prototype.getSystemDateAndTime = function (input) {
 	var this_wrapper = this;
 	new Cam(
