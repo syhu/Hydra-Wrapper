@@ -265,6 +265,21 @@ onvifc.prototype.getNTP = function (input) {
 
 onvifc.prototype.setNTP = function (input) {
 	var this_wrapper = this;
+	var options = {};
+	options.fromDHCP = input.fromDHCP;
+	options.type = input.NTPtype;
+	
+	if (input.DNSname !== undefined) {
+		options.DNSname = input.DNSname;
+	}
+
+	if (input.IPv4Address !== undefined) {
+		options.IPv4Address = input.IPv4Address;
+	}
+
+	if (input.IPv6Address !== undefined) {
+		options.IPv6Address = input.IPv6Address;
+	}
 	new Cam(
 		{
 			hostname: this_wrapper.data.host,
@@ -272,7 +287,7 @@ onvifc.prototype.setNTP = function (input) {
 			username: this_wrapper.data.user,
 			password: this_wrapper.data.passwd
 		},function(err){
-			this.setNTP(input, function(err, stream){
+			this.setNTP(options, function(err, stream){
 				if (!err) {
 					input.onDone(stream);
 				} else {
