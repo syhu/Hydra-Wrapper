@@ -21,7 +21,7 @@ test = function (input) {
 		"onDone": onDone,
 		"onFail": onFail,
 		"fromDHCP": false,
-		"type": "DNS",
+		"NTPtype": "DNS",
 		"DNSname": "ntp.ubuntu"
 	};
 
