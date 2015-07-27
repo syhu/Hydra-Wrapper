@@ -574,6 +574,28 @@ onvifc.prototype.getVideoEncoderConfigurations = function (input) {
 	
 };
 
+onvifc.prototype.getAudioOutputConfigurations = function (input) {
+	var this_wrapper = this;
+	new Cam(
+		{
+			hostname: this_wrapper.data.host,
+			port: this_wrapper.data.port,
+			username: this_wrapper.data.user,
+			password: this_wrapper.data.passwd
+		},function(err){
+			this.getAudioOutputConfigurations(function(err, stream){
+				if (!err) {
+					input.onDone(stream);
+				} else {
+					input.onFail(err);
+				}
+			
+			});
+		}
+	);
+		
+};
+
 onvifc.prototype.getImagingSettings = function (input) {
 	var token, argv4, this_wrapper = this;
 	var local_obj = {
