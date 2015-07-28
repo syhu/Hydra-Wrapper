@@ -846,14 +846,18 @@ onvifc.prototype.getVideoEncoderConfiguration = function (input) {
 			password: this_wrapper.data.passwd
 		},function(err){
 			this.getVideoEncoderConfigurations(function(err, stream){
-				if(stream) {
-					Object.keys(stream).forEach(function(key){
-						if(stream[key].$.token === input.token) {
-							input.onDone(stream[key]);
-						}
-					});
+				if(!err) {
+					if (input.token) {
+						Object.keys(stream).forEach(function(key){
+							if(stream[key].$.token === input.token) {
+								input.onDone(stream[key]);
+							}
+						});
+					} else {
+						input.onDone(stream[0]);
+					}
 				} else {
-					input.onFail("password error");
+					input.onFail(err);
 				}
 			});
 		}

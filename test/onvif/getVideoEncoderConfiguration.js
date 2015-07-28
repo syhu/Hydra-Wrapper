@@ -19,8 +19,8 @@ test = function (input) {
 
 	var getstream = {
 		"onDone": onDone,
-		"onFail": onFail,
-		"token" : "vid_enc_config_0"
+		"onFail": onFail
+		//"token" : "vid_enc_config_0"
 	};
 
 	var setup = {
