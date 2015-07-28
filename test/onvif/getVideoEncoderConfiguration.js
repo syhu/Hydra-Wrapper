@@ -17,10 +17,10 @@ test = function (input) {
 		console.log(response);
 	}
 
-	var getDevInfo = {
+	var getstream = {
 		"onDone": onDone,
 		"onFail": onFail,
-		"channel": "ch_1"
+		"token" : "vid_enc_config_0"
 	};
 
 	var setup = {
@@ -35,12 +35,12 @@ test = function (input) {
 	};
 
 	setup.onDone = function (response) {
+		self.wrapper.getVideoEncoderConfiguration(getstream);
 	}
 
 	var wrapper = require("../../wrapper.js");
 	this.wrapper = new wrapper();
 	this.wrapper.setup(setup);
-	this.wrapper.getVideoEncoderConfiguration(getDevInfo);
 
 /*	while (typeof(this.wrapper.getDeviceInformation) === "undefined") {
 		if (typeof(this.wrapper.getDeviceInformation) !== "undefined") {

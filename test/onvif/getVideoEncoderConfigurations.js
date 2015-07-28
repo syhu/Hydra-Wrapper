@@ -1,5 +1,5 @@
 var fs = require("fs");
-var demosite = JSON.parse(fs.readFileSync("../../../../connector/onvif/test/demosite.json", "utf8"));
+var demosite = JSON.parse(fs.readFileSync("../../../../connector/onvif/test/demosite118.json", "utf8"));
 
 test = function (input) {
 	var self = this;
@@ -17,9 +17,9 @@ test = function (input) {
 		console.log(response);
 	}
 
-	var getDevInfo = {
+	var getstream = {
 		"onDone": onDone,
-		"onFail": onFail,
+		"onFail": onFail
 	};
 
 	var setup = {
@@ -34,12 +34,12 @@ test = function (input) {
 	};
 
 	setup.onDone = function (response) {
+		self.wrapper.getVideoEncoderConfigurations(getstream);
 	}
 
 	var wrapper = require("../../wrapper.js");
 	this.wrapper = new wrapper();
 	this.wrapper.setup(setup);
-	this.wrapper.getVideoEncoderConfigurations(getDevInfo);
 
 /*	while (typeof(this.wrapper.getDeviceInformation) === "undefined") {
 		if (typeof(this.wrapper.getDeviceInformation) !== "undefined") {

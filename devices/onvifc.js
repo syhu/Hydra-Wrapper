@@ -564,12 +564,23 @@ onvifc.prototype.getVideoSources = function (input) {
 };
 
 onvifc.prototype.getVideoEncoderConfigurations = function (input) {
-	this.execute(
-		'GetVideoEncoderConfigurations',
-		'',
-		'',
-		input.onDone,
-		input.onFail
+	var this_wrapper = this;
+	new Cam (
+	{
+		hostname: this_wrapper.data.host,
+		port: this_wrapper.data.port,
+		username: this_wrapper.data.user,
+		password: this_wrapper.data.passwd
+		
+	}, function (err) {
+			this.getVideoEncoderConfigurations(function(err, stream){
+				if(!err) {
+					input.onDone(stream);	
+				} else {
+					input.onFail(err);
+				}
+			});
+		}
 	);
 	
 };
@@ -836,11 +847,11 @@ onvifc.prototype.getVideoEncoderConfiguration = function (input) {
 		},function(err){
 			this.getVideoEncoderConfigurations(function(err, stream){
 				if(stream) {
-					if(input.channel == "ch_0") {
-						input.onDone(stream[0]);
-					} else {
-						input.onDone(stream[1]);
-					}
+					Object.keys(stream).forEach(function(key){
+						if(stream[key].$.token === input.token) {
+							input.onDone(stream[key]);
+						}
+					});
 				} else {
 					input.onFail("password error");
 				}
