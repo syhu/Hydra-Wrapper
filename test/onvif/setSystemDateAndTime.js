@@ -1,5 +1,5 @@
 var fs = require("fs");
-var demosite = JSON.parse(fs.readFileSync("../../../../connector/onvif/test/demosite.json", "utf8"));
+var demosite = JSON.parse(fs.readFileSync("../../../../connector/onvif/test/demosite118.json", "utf8"));
 
 test = function (input) {
 	var self = this;
@@ -20,7 +20,7 @@ test = function (input) {
 	var getstream = {
 		"onDone": onDone,
 		"onFail": onFail,
-		"DateTimeType" : "Manual",
+		"DateTimeType" : "NTP",
 		"DaylightSavings" : "true",
 		"TimeZone" : "CST-8",
 		"Year" : "2015",

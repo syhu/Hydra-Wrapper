@@ -20,13 +20,14 @@ test = function (input) {
 	var getDevInfo = {
 		"onDone": onDone,
 		"onFail": onFail,
-		"channel": "ch_1",
 //		下列至少要有一個,若不設定可以不給
+//		"name" : "a",
 		"quality": 80,
-		"framerate": 10,
-		"bitrate": 4000,
-		"resolution_width": 640,
-		"resolution_height": 480
+		"govLength": 20,
+		"frameRate": 10,
+		"bitRate": 4000,
+		"width": 640,
+		"height": 480
 	};
 
 	var setup = {
