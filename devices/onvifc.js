@@ -865,7 +865,68 @@ onvifc.prototype.getVideoEncoderConfiguration = function (input) {
 	
 };
 
+
 onvifc.prototype.setVideoEncoderConfiguration = function (input) {
+	var this_wrapper = this, 
+		options = {},	//setVideoEncoderConfiguration connector settings parm 
+		local_obj = {};	//getVideoEncoderConfiguration wrapper input
+
+	if (input.token) {
+		//for getVideoEncoderConfiguration
+		local_obj.token = input.token;
+	}
+
+	local_obj.onDone = function (RET) {
+		options.token = RET.$.token;	
+		options.name = input.name || RET.name; 	
+		options.useCount = input.useCount || RET.useCount;
+		options.encoding = input.encoding || RET.encoding;
+		options.width = input.width || RET.resolution.width;
+		options.height = input.height || RET.resolution.height;
+		options.quality = input.quality || RET.quality;
+		options.bitRate = input.bitRate || RET.rateControl.bitrateLimit;
+		options.frameRate = input.frameRate || RET.rateControl.frameRateLimit;
+		options.encodingInterval = input.encodingInterval || RET.rateControl.encodingInterval;
+		options.MPEG4govLength = RET.MPEG4.govLength;
+		options.MPEG4profile = RET.MPEG4.mpeg4Profile;
+		options.H264govLength = input.govLength || RET.H264.govLength;
+		options.H264profile = input.profile || RET.H264.H264Profile;
+		options.multicastAddressType = RET.multicast.address.type;
+		options.multicastAddress = RET.multicast.address.IPv4Address;
+		options.multicastPort = RET.multicast.port;
+		options.multicastTTL = RET.multicast.TTL;
+		options.multicastAutoStart = RET.multicast.autoStart;
+		options.sessionTimeout = RET.sessionTimeout;
+
+		new Cam(
+			{
+				hostname: this_wrapper.data.host,
+				port: this_wrapper.data.port,
+				username: this_wrapper.data.user,
+				password: this_wrapper.data.passwd
+			},function(err){
+				this.setVideoEncoderConfiguration(options, function(err, stream){
+					if(!err) {
+						Object.keys(stream).forEach(function(key){
+							if(stream[key].$.token === options.token) {
+								input.onDone(stream[key]);
+							}
+						});
+					} else {
+						input.onFail(err);
+					}
+				});
+			}
+		);
+		
+	}; 
+	
+	local_obj.onFail = input.onFail;
+
+	this.getVideoEncoderConfiguration(local_obj);
+};
+
+onvifc.prototype.c_version_setVideoEncoderConfiguration = function (input) {
 	var token, argv4, this_wrapper = this;
 	var local_obj = {
 		onFail: input.onFail
