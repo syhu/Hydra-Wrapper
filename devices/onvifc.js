@@ -887,8 +887,14 @@ onvifc.prototype.setVideoEncoderConfiguration = function (input) {
 		options.bitRate = input.bitRate || RET.rateControl.bitrateLimit;
 		options.frameRate = input.frameRate || RET.rateControl.frameRateLimit;
 		options.encodingInterval = input.encodingInterval || RET.rateControl.encodingInterval;
-		options.MPEG4govLength = RET.MPEG4.govLength;
-		options.MPEG4profile = RET.MPEG4.mpeg4Profile;
+		if (RET.hasOwnProperty('MPEG4')) {
+			if (RET.MPEG4.hasOwnProperty('govLength')) {
+				options.MPEG4govLength = RET.MPEG4.govLength;
+			}
+			if (RET.MPEG4.hasOwnProperty('mpeg4Profile')) {
+				options.MPEG4profile = RET.MPEG4.mpeg4Profile;
+			}
+		}
 		options.H264govLength = input.govLength || RET.H264.govLength;
 		options.H264profile = input.profile || RET.H264.H264Profile;
 		options.multicastAddressType = RET.multicast.address.type;
