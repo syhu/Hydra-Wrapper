@@ -104,14 +104,17 @@ onvifc.prototype.autoScan = function(input){
 		
 		cams[address] = (camData);
 	});
-	
-	
+
+	onvif.Discovery.on("error", function (error) {
+		console.log(error);
+		// input.onFail ??
+	});
+
 	onvif.Discovery.probe({resolve: false}, function () {
-		
 		input.onDone( Object.keys(cams).map(function(address) { return cams[address]; }) );
 	});
-	
-	
+
+
 	/*
 	discovery.probe(function(_null, rinfo){
 		
@@ -322,6 +325,8 @@ onvifc.prototype.getSystemDateAndTime = function (input) {
 };
 
 onvifc.prototype.setSystemDateAndTime = function (input) {
+	console.log("onvif input: ");
+	console.log(input);
 	var options = {};
 	options.dateTimeType = input.DateTimeType;
 	options.daylightSavings = input.DaylightSavings;
@@ -345,7 +350,7 @@ onvifc.prototype.setSystemDateAndTime = function (input) {
 				if (stream) {
 					input.onDone(stream);
 				} else {
-					input.onFail("password error");
+					input.onFail("password error"); // ??
 				}
 			
 			});
