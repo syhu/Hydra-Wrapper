@@ -40,11 +40,16 @@ function deeplet(input) {
 deeplet.prototype.checkCallbacks = function (input) {
 	if (typeof(input) !== "undefined") {
 		if (typeof(input.onDone) === "undefined") {
+			LOG.error("input.onDone = console.log");
+			LOG.error(input);
 			input.onDone = console.log;
 		}
-		if ((typeof(input.onFail) === "undefined") && (typeof(input.onError === "undefined"))) {
+		if ((typeof(input.onFail) === "undefined") && (typeof(input.onError) === "undefined")) {
+			LOG.error("input.onFail = console.log");
+			LOG.error(input);
 			input.onFail = console.log;
 		} else if ((typeof(input.onFail) === "undefined") && typeof(input.onError !== "undefined")) {
+			LOG.warn("input.onFail = input.onError");
 			input.onFail = input.onError;
 		}
 	} else {
@@ -142,7 +147,7 @@ deeplet.prototype.setupConnector = function (input) {
 	if (typeof(global) === "undefined" || typeof(global.g_settings) === "undefined" || typeof(global.g_settings.path) === "undefined") {
 		// local testing
 		LOG.warn("global.g_settings.path undefined");
-		var connector = require("../../Hydra-Connector-DVR/dvr_connector_OO.js");
+		var connector = require("../../../connector/dvr_deeplet/dvr_connector_OO.js");
 
 	} else if (typeof(global) !== "undefined" && typeof(global.g_settings) !== "undefined" && typeof(global.g_settings.path) === "undefined") {
 		// libPath undefined
