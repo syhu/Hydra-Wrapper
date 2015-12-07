@@ -380,7 +380,13 @@ deeplet.prototype.disconnect = function (input) {
 		"onDone": function (response) {
 			self.dvr_connector.exit(disconn_ctrl);
 		},
-		"onFail": input.onFail
+		"onFail": function (response) {
+			try {
+				self.dvr_connector.exit(disconn_ctrl);
+			} catch (err) {
+				input.onFail(err);
+			}
+		}
 	};
 	if (typeof(this.dvr_connector.data_port) === "undefined") {
 		this.dvr_connector.exit(disconn_ctrl);
