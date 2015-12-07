@@ -435,6 +435,10 @@ onvifc.prototype.exit = function(input){
 	input.onDone("GG");
 }
 
+onvifc.prototype.disconnect = function(input){
+	input.onDone("GG");
+}
+
 onvifc.prototype.getStreamUri = function(input){
 	var this_wrapper = this;
 	//for error ip input
