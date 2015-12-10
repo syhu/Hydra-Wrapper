@@ -49,6 +49,26 @@ function onvifc(input) {
 	return this;
 }
 
+onvifc.prototype.checkCallbacks = function (input) {
+	if (typeof(input) !== "undefined") {
+		if (typeof(input.onDone) === "undefined") {
+			LOG.error("input.onDone = console.log");
+			LOG.error(input);
+			input.onDone = console.log;
+		}
+		if ((typeof(input.onFail) === "undefined") && (typeof(input.onError) === "undefined")) {
+			LOG.error("input.onFail = console.log");
+			LOG.error(input);
+			input.onFail = console.log;
+		} else if ((typeof(input.onFail) === "undefined") && typeof(input.onError !== "undefined")) {
+			LOG.warn("input.onFail = input.onError");
+			input.onFail = input.onError;
+		}
+	} else {
+		LOG.error("");
+	}
+}
+
 //~ var INIT = function (obj) {
 onvifc.prototype.init = function (input) {
 	this.data = input;
@@ -432,10 +452,11 @@ onvifc.prototype.status = function (input) {
 };
 
 onvifc.prototype.exit = function(input){
-	input.onDone("GG");
+	this.disconnect(input);
 }
 
 onvifc.prototype.disconnect = function(input){
+	this.checkCallbacks(input);
 	input.onDone("GG");
 }
 
