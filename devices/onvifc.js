@@ -456,8 +456,10 @@ onvifc.prototype.exit = function(input){
 }
 
 onvifc.prototype.disconnect = function(input){
-	this.checkCallbacks(input);
-	input.onDone("GG");
+	if (typeof(input) !== "undefined") {
+		this.checkCallbacks(input);
+		input.onDone("GG");
+	}
 }
 
 onvifc.prototype.getStreamUri = function(input){
@@ -874,22 +876,30 @@ onvifc.prototype.getVideoEncoderConfiguration = function (input) {
 			port: this_wrapper.data.port,
 			username: this_wrapper.data.user,
 			password: this_wrapper.data.passwd
-		},function(err){
-			this.getVideoEncoderConfigurations(function(err, stream){
-				if(!err) {
-					if (input.token) {
-						Object.keys(stream).forEach(function(key){
-							if(stream[key].$.token === input.token) {
-								input.onDone(stream[key]);
+		}, function (err) {
+			this.getVideoEncoderConfigurations(
+				function (err, stream) {
+					if(!err) {
+						if (input.token) {
+							try {
+								Object.keys(stream).forEach(
+									function (key) {
+										if (stream[key].$.token === input.token) {
+											input.onDone(stream[key]);
+										}
+									}
+								);
+							} catch (error) {
+								input.onFail(error);
 							}
-						});
+						} else {
+							input.onDone(stream[0]);
+						}
 					} else {
-						input.onDone(stream[0]);
+						input.onFail(err);
 					}
-				} else {
-					input.onFail(err);
 				}
-			});
+			);
 		}
 	);
 	
@@ -940,18 +950,24 @@ onvifc.prototype.setVideoEncoderConfiguration = function (input) {
 				port: this_wrapper.data.port,
 				username: this_wrapper.data.user,
 				password: this_wrapper.data.passwd
-			},function(err){
-				this.setVideoEncoderConfiguration(options, function(err, stream){
-					if(!err) {
-						Object.keys(stream).forEach(function(key){
-							if(stream[key].$.token === options.token) {
-								input.onDone(stream[key]);
+			},
+			function (err) {
+				this.setVideoEncoderConfiguration(
+					options,
+					function(err, stream) {
+						if (!err) {
+							if (typeof (stream) !== "undefined") {
+								if (typeof (stream.$) !== "undefined") {
+									if (stream.$.token === options.token) {
+										input.onDone(stream);
+									}
+								}
 							}
-						});
-					} else {
-						input.onFail(err);
+						} else {
+							input.onFail(err);
+						}
 					}
-				});
+				);
 			}
 		);
 		
