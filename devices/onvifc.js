@@ -36,6 +36,7 @@ var Cam = require('onvif').Cam;
 var discovery = require('onvif').Discovery;
 var http = require('http');
 var onvif = require('onvif');
+var moment = require("moment");
 //~ var child;
 
 //var obj = {};
@@ -351,12 +352,71 @@ onvifc.prototype.setSystemDateAndTime = function (input) {
 	options.dateTimeType = input.DateTimeType;
 	options.daylightSavings = input.DaylightSavings;
 	options.timezone = input.TimeZone;
-	options.year = input.Year;
+
+/*	options.year = input.Year;
 	options.month = input.Month;
 	options.day = input.Day;
 	options.hour = input.Hour;
 	options.minute = input.Minute;
-	options.second = input.Second;
+	options.second = input.Second;*/
+	var time = {};
+	var check = new moment({
+		"year": input.Year,
+		"month": input.Month,
+		"day": input.Day,
+	});
+
+	if (input.Second >= 0 && input.Second < 60) {
+		time.sec = input.Second;
+	} else {
+		input.onFail("second [0 - 59].");
+		return;
+	}
+	if (input.Minute >=0 && input.Minute < 60) {
+		time.min = input.Minute;
+	} else {
+		input.onFail("minute [0 - 59].");
+		return;
+	}
+	if (input.Hour >= 0 && input.Hour < 24) {
+		time.hour = input.Hour;
+	} else {
+		input.onFail("hour [0 - 23].");
+		return;
+	}
+
+	if (input.Year >= 1900) {
+		time.year = input.Year;
+	} else {
+		input.onFail("year [must greater than 1900].");
+		return;
+	}
+	if (input.Month > 0 && input.Month < 13) {
+		time.mon = input.Month - 1;
+		// moment use 0 - 11
+	} else {
+		input.onFail("Month [1 - 12].");
+		return;
+	}
+	if (parseInt(input.Day) > 0 && parseInt(input.Day) <= parseInt(check.endOf("month")._d.toString().split(" ")[2])) {
+		console.log(check.date());
+		time.day = input.Day;
+		check.date(input.Day);
+	} else {
+		console.log(check);
+		input.onFail("day [1 - " + check.endOf("month")._d.toString().split(" ")[2] + "] (Year: " + check.year() + ", Month: "+ (check.month() + 1) + ")");
+		return;
+	}
+	// time_settings.data.wday = check.day(); // sunday: 0, Saturday: 6
+	// time_settings.data.yday = check.dayOfYear();
+
+	// self.dvr_connector.set_sys_time(time_settings);
+
+
+//	options.dateTime = moment.utc([time.year, time.mon, time.day, time.hour, time.min, time.sec, 0 /*millisecond*/]).valueOf();
+	options.dateTime = new Date(time.year, time.mon, time.day, time.hour, time.min, time.sec, 0 /*millisecond*/);
+	console.log(options);
+	console.log(options.dateTime.getUTCFullYear());
 
 	var this_wrapper = this;
 	new Cam(
@@ -451,18 +511,18 @@ onvifc.prototype.status = function (input) {
 	input.onDone({status:this.data}); 
 };
 
-onvifc.prototype.exit = function(input){
+onvifc.prototype.exit = function(input) {
 	this.disconnect(input);
 }
 
-onvifc.prototype.disconnect = function(input){
+onvifc.prototype.disconnect = function(input) {
 	if (typeof(input) !== "undefined") {
 		this.checkCallbacks(input);
 		input.onDone("GG");
 	}
 }
 
-onvifc.prototype.getStreamUri = function(input){
+onvifc.prototype.getStreamUri = function(input) {
 	var this_wrapper = this;
 	//for error ip input
 	var options = {
