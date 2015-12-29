@@ -1020,7 +1020,6 @@ onvifc.prototype.setVideoEncoderConfiguration = function (input) {
 					LOG.error(err);
 					return;
 				}
-				console.log(options);
 				this.setVideoEncoderConfiguration(
 					options,
 					function(err, stream) {
