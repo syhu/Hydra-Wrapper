@@ -560,9 +560,6 @@ onvifc.prototype.getStreamUri = function(input) {
 	var uri = [];
 	var get_profiles_param = {
 		"onDone": function (profiles) {
-			LOG.warn("getProfiles done");
-			LOG.warn(profiles);
-			LOG.warn(profiles.Profiles.length);
 
 			var recursive_call = function (stop) {
 				new Cam(
@@ -581,13 +578,10 @@ onvifc.prototype.getStreamUri = function(input) {
 								"profileToken": profiles.Profiles[stop].$.token
 							},
 							function(err, stream) {
-								LOG.warn("getStreamUri");
-								LOG.warn(stream);
 								var done = 0;
 								uri[stop] = stream.uri;
 								stop++;
 								if (stop == profiles.Profiles.length) {
-									LOG.warn("call onDone");
 									input.onDone({
 										"uristream" : uri
 									});
@@ -610,6 +604,7 @@ onvifc.prototype.getStreamUri = function(input) {
 
 onvifc.prototype.getDeviceInformation = function(input){
 	var this_wrapper = this;
+	var self = this;
 	var local_obj = {
 		onFail: input.onFail
 	};
@@ -635,8 +630,8 @@ onvifc.prototype.getDeviceInformation = function(input){
 			}
 		});
 		
-		console.log("scope_obj");
-		console.log(scopes_obj);
+		// console.log("scope_obj");
+		// console.log(scopes_obj);
 		new Cam(
 			{
 				hostname: this_wrapper.data.host,
@@ -644,33 +639,32 @@ onvifc.prototype.getDeviceInformation = function(input){
 				username: this_wrapper.data.user,
 				password: this_wrapper.data.passwd
 			},function(err){
-				this.getDeviceInformation(function(err, stream){
+				this.getDeviceInformation(function (err, stream) { /* stream ????? */
 					if(err) {
 						console.log(err);
-						input.onFail("password error");
+						input.onFail(err);
 					} else {
-						var Uri_stream;
-						var cam_this = this;
-						cam_this.getStreamUri(function(err, uri){
-							Uri_stream = uri;
-							if(typeof(stream) !== "undefined" && typeof(uri) !== "undefined" && typeof(scopes_obj !== "undefined")){
-								console.log(stream);
-								input.onDone({
-									"Name" : scopes_obj.name,
-									"Type" : scopes_obj.type,
-									"Location" : scopes_obj.location,
-									"Harware" : scopes_obj.hardware,
-									"Manufacturer" : stream.manufacturer,
-									"Model" : stream.model,
-									"Serial" : stream.serialNumber,
-									"Version" : stream.firmwareVersion,
-									"rtsp" : Uri_stream.uri
-								});
-							} else{
-								input.onFail({
-									"Error" : "NULL"
-								});
-							}
+
+						self.getStreamUri({
+							"onDone": function (uri) {
+								if(typeof(stream) !== "undefined" && typeof(uri) !== "undefined" && typeof(scopes_obj !== "undefined")){
+									console.log(stream);
+									input.onDone({
+										"Name" : scopes_obj.name,
+										"Type" : scopes_obj.type,
+										"Location" : scopes_obj.location,
+										"Harware" : scopes_obj.hardware,
+										"Manufacturer" : stream.manufacturer,
+										"Model" : stream.model,
+										"Serial" : stream.serialNumber,
+										"Version" : stream.firmwareVersion,
+										"rtsp" : uri.uristream
+									});
+								} else{
+									input.onFail(err);
+								}
+							},
+							"onFail": input.onFail
 						});
 					}
 				});
