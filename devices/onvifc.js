@@ -522,33 +522,89 @@ onvifc.prototype.disconnect = function(input) {
 	}
 }
 
-onvifc.prototype.getStreamUri = function(input) {
-	var this_wrapper = this;
-	//for error ip input
-	var options = {
-		host: this.data.host,
-		port: 80,
-		path: ''
-	};
-
+onvifc.prototype.getProfiles = function (input) {
+	var self = this;
 	new Cam(
 		{
-			hostname: this_wrapper.data.host,
-			port: this_wrapper.data.port,
-			username: this_wrapper.data.user,
-			password: this_wrapper.data.passwd
-		},function(err){
-			this.getStreamUri(function(err, stream){
-				if(stream) {
-					input.onDone({
-						"uristream" : stream
-					});
+			"hostname": self.data.host,
+			"port": self.data.port,
+			"username": self.data.user,
+			"password": self.data.passwd
+		},
+		function (err) {
+			if (err) {
+				LOG.error(err);
+				return;
+			}
+			this.getProfiles(function (error, profiles) {
+				if (error) {
+					console.log(error);
+					return;
+				}
+				if (profiles) {
+					// console.log(profiles);
+					/*for (var i = 0; i < profiles.length; i++) {
+						console.log(profiles[i].$.token);
+					}*/
+					input.onDone({"Profiles": profiles});
 				} else {
-					input.onFail("password error");
+					input.onFail(error);
 				}
 			});
 		}
 	);
+}
+
+onvifc.prototype.getStreamUri = function(input) {
+	var self = this;
+	var uri = [];
+	var get_profiles_param = {
+		"onDone": function (profiles) {
+			LOG.warn("getProfiles done");
+			LOG.warn(profiles);
+			LOG.warn(profiles.Profiles.length);
+
+			var recursive_call = function (stop) {
+				new Cam(
+					{
+						hostname: self.data.host,
+						port: self.data.port,
+						username: self.data.user,
+						password: self.data.passwd
+					},function (err) {
+						if (err) {
+							LOG.error("err");
+							LOG.error(err);
+						}
+						this.getStreamUri(
+							{
+								"profileToken": profiles.Profiles[stop].$.token
+							},
+							function(err, stream) {
+								LOG.warn("getStreamUri");
+								LOG.warn(stream);
+								var done = 0;
+								uri[stop] = stream.uri;
+								stop++;
+								if (stop == profiles.Profiles.length) {
+									LOG.warn("call onDone");
+									input.onDone({
+										"uristream" : uri
+									});
+								} else {
+									recursive_call(stop);
+								}
+							}
+						);
+					}
+				);
+			}
+			recursive_call(0);
+		},
+		"onFail": input.onFail
+	};
+
+	this.getProfiles(get_profiles_param);
 	
 }
 
