@@ -66,7 +66,11 @@ onvifc.prototype.checkCallbacks = function (input) {
 			input.onFail = input.onError;
 		}
 	} else {
-		LOG.error("");
+		LOG.error("input undefined");
+		LOG.error("input.onDone = console.log");
+		LOG.error("input.onFail = console.log");
+		input.onDone = console.log;
+		input.onFail = console.log;
 	}
 }
 
@@ -346,8 +350,6 @@ onvifc.prototype.getSystemDateAndTime = function (input) {
 };
 
 onvifc.prototype.setSystemDateAndTime = function (input) {
-	console.log("onvif input: ");
-	console.log(input);
 	var options = {};
 	options.dateTimeType = input.DateTimeType;
 	options.daylightSavings = input.DaylightSavings;
@@ -399,7 +401,7 @@ onvifc.prototype.setSystemDateAndTime = function (input) {
 		return;
 	}
 	if (parseInt(input.Day) > 0 && parseInt(input.Day) <= parseInt(check.endOf("month")._d.toString().split(" ")[2])) {
-		console.log(check.date());
+		// console.log(check.date());
 		time.day = input.Day;
 		check.date(input.Day);
 	} else {
@@ -415,8 +417,6 @@ onvifc.prototype.setSystemDateAndTime = function (input) {
 
 //	options.dateTime = moment.utc([time.year, time.mon, time.day, time.hour, time.min, time.sec, 0 /*millisecond*/]).valueOf();
 	options.dateTime = new Date(time.year, time.mon, time.day, time.hour, time.min, time.sec, 0 /*millisecond*/);
-	console.log(options);
-	console.log(options.dateTime.getUTCFullYear());
 
 	var this_wrapper = this;
 	new Cam(
@@ -965,11 +965,12 @@ onvifc.prototype.getVideoEncoderConfiguration = function (input) {
 	
 };
 
-
+// FIXME: refactor needed
 onvifc.prototype.setVideoEncoderConfiguration = function (input) {
 	var this_wrapper = this, 
 		options = {},	//setVideoEncoderConfiguration connector settings parm 
 		local_obj = {};	//getVideoEncoderConfiguration wrapper input
+		channel = input.channel || 0; // default: first encoder
 
 	if (input.token) {
 		//for getVideoEncoderConfiguration
@@ -977,32 +978,35 @@ onvifc.prototype.setVideoEncoderConfiguration = function (input) {
 	}
 
 	local_obj.onDone = function (RET) {
-		options.token = RET.$.token;	
-		options.name = input.name || RET.name; 	
-		options.useCount = input.useCount || RET.useCount;
-		options.encoding = input.encoding || RET.encoding;
-		options.width = input.width || RET.resolution.width;
-		options.height = input.height || RET.resolution.height;
-		options.quality = input.quality || RET.quality;
-		options.bitRate = input.bitRate || RET.rateControl.bitrateLimit;
-		options.frameRate = input.frameRate || RET.rateControl.frameRateLimit;
-		options.encodingInterval = input.encodingInterval || RET.rateControl.encodingInterval;
-		if (RET.hasOwnProperty('MPEG4')) {
-			if (RET.MPEG4.hasOwnProperty('govLength')) {
-				options.MPEG4govLength = RET.MPEG4.govLength;
+		options.token = RET[channel].$.token;
+		options.name = input.name || RET[channel].name;
+		options.useCount = input.useCount || RET[channel].useCount;
+		options.encoding = input.encoding || RET[channel].encoding;
+		/*options.width = input.width || RET[channel].resolution.width;
+		options.height = input.height || RET[channel].resolution.height;*/
+		options.resolution = {};
+		options.resolution.width = input.width || RET[channel].resolution.width;
+		options.resolution.height = input.height || RET[channel].resolution.height;
+		options.quality = input.quality || RET[channel].quality;
+		options.bitRate = input.bitRate || RET[channel].rateControl.bitrateLimit;
+		options.frameRate = input.frameRate || RET[channel].rateControl.frameRateLimit;
+		options.encodingInterval = input.encodingInterval || RET[channel].rateControl.encodingInterval;
+		if (RET[channel].hasOwnProperty('MPEG4')) {
+			if (RET[channel].MPEG4.hasOwnProperty('govLength')) {
+				options.MPEG4govLength = RET[channel].MPEG4.govLength;
 			}
-			if (RET.MPEG4.hasOwnProperty('mpeg4Profile')) {
-				options.MPEG4profile = RET.MPEG4.mpeg4Profile;
+			if (RET[channel].MPEG4.hasOwnProperty('mpeg4Profile')) {
+				options.MPEG4profile = RET[channel].MPEG4.mpeg4Profile;
 			}
 		}
-		options.H264govLength = input.govLength || RET.H264.govLength;
-		options.H264profile = input.profile || RET.H264.H264Profile;
-		options.multicastAddressType = RET.multicast.address.type;
-		options.multicastAddress = RET.multicast.address.IPv4Address;
-		options.multicastPort = RET.multicast.port;
-		options.multicastTTL = RET.multicast.TTL;
-		options.multicastAutoStart = RET.multicast.autoStart;
-		options.sessionTimeout = RET.sessionTimeout;
+		options.H264govLength = input.govLength || RET[channel].H264.govLength;
+		options.H264profile = input.profile || RET[channel].H264.H264Profile;
+		options.multicastAddressType = RET[channel].multicast.address.type;
+		options.multicastAddress = RET[channel].multicast.address.IPv4Address;
+		options.multicastPort = RET[channel].multicast.port;
+		options.multicastTTL = RET[channel].multicast.TTL;
+		options.multicastAutoStart = RET[channel].multicast.autoStart;
+		options.sessionTimeout = RET[channel].sessionTimeout;
 
 		new Cam(
 			{
@@ -1012,6 +1016,11 @@ onvifc.prototype.setVideoEncoderConfiguration = function (input) {
 				password: this_wrapper.data.passwd
 			},
 			function (err) {
+				if (err) {
+					LOG.error(err);
+					return;
+				}
+				console.log(options);
 				this.setVideoEncoderConfiguration(
 					options,
 					function(err, stream) {
@@ -1035,8 +1044,44 @@ onvifc.prototype.setVideoEncoderConfiguration = function (input) {
 	
 	local_obj.onFail = input.onFail;
 
-	this.getVideoEncoderConfiguration(local_obj);
+	this.getVideoEncoderConfigurations(local_obj);
 };
+
+onvifc.prototype.setLowResolution = function (input) {
+	var self = this;
+	this.checkCallbacks(input);
+
+	input.channel = ((input.channel) ? 1 : 0);
+
+	var setLowRes = {
+		"onDone": input.onDone,
+		"onFail": input.onFail,
+		"channel": input.channel,
+		"width": 352,
+		"height": 240,
+		"frameRate": 10
+	};
+
+	this.setVideoEncoderConfiguration(setLowRes);
+}
+
+onvifc.prototype.setHighResolution = function (input) {
+	var self = this;
+	this.checkCallbacks(input);
+
+	input.channel = ((input.channel) ? 1 : 0);
+
+	var setHighRes = {
+		"onDone": input.onDone,
+		"onFail": input.onFail,
+		"channel": input.channel,
+		"width": 1920,
+		"height": 1080,
+		"frameRate": 30
+	};
+
+	this.setVideoEncoderConfiguration(setHighRes);
+}
 
 onvifc.prototype.c_version_setVideoEncoderConfiguration = function (input) {
 	var token, argv4, this_wrapper = this;
