@@ -238,7 +238,13 @@ onvifc.prototype.getScopes = function (input) {
 				if (stream) {
 					input.onDone(stream);
 				} else {
-					input.onFail("password error");
+					LOG.error("onvif getScopes Fail: ");
+					LOG.error(err.code);
+					if (typeof(err.code) === "string") {
+						input.onFail(err.code);
+					} else {
+						input.onFail(err);
+					}
 				}
 			
 			});
