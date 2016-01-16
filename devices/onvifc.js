@@ -455,7 +455,7 @@ onvifc.prototype.setSystemDateAndTime = function (input) {
 			this.setSystemDateAndTime(options, function (err, date) {
 				// console.log(err);
 				// console.log(date[0].fault);
-				// console.log(date[0].fault[0].reason[0].text[0]._); // what
+				// console.log(date[0].fault[0].reason[0].text[0]._); // what ._.
 				if (!err) {
 					input.onDone(date);
 				} else {
@@ -466,7 +466,7 @@ onvifc.prototype.setSystemDateAndTime = function (input) {
 						try {
 							input.onFail(date[0].fault[0].reason[0].text[0]._);
 						} catch (err) {
-							input.onFail(date);
+							input.onFail(JSON.stringify(date)); // sorry ._.`
 						}
 					} else {
 						input.onFail(err);
