@@ -239,7 +239,6 @@ onvifc.prototype.getScopes = function (input) {
 					input.onDone(scopes);
 				} else {
 					LOG.error("onvif getScopes Fail: ");
-					LOG.error(err.code);
 					if (typeof(err.code) === "string") {
 						input.onFail(err.code);
 					} else {
@@ -261,17 +260,12 @@ onvifc.prototype.getHostname = function (input) {
 			port: this_wrapper.data.port,
 			username: this_wrapper.data.user,
 			password: this_wrapper.data.passwd
-		},function (err) {
+		}, function (err) {
 			this.getHostname(function (err, hostname) {
 				if (hostname) {
 					input.onDone(hostname);
 				} else {
 					LOG.error("onvif getHostname Fail: ");
-					for (var key in err) {
-						LOG.error(key);
-						LOG.error(err[key]);
-					}
-					
 					if (typeof(err.code) === "string") {
 						input.onFail(err.code);
 					} else {
@@ -293,12 +287,17 @@ onvifc.prototype.getNTP = function (input) {
 			port: this_wrapper.data.port,
 			username: this_wrapper.data.user,
 			password: this_wrapper.data.passwd
-		},function(err){
-			this.getNTP(function(err, stream){
+		}, function (err) {
+			this.getNTP(function (err, ntp) {
 				if (!err) {
-					input.onDone(stream);
+					input.onDone(ntp);
 				} else {
-					input.onFail("password error");
+					LOG.error("onvif getHostname Fail: ");
+					if (typeof(err.code) === "string") {
+						input.onFail(err.code);
+					} else {
+						input.onFail(err);
+					}
 				}
 			
 			});
