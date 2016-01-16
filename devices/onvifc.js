@@ -486,6 +486,7 @@ onvifc.prototype.setScopes = function (input) {
 	};
 
 	local_obj.onDone = function (RET) {
+		console.log(RET);
 		var local_obj_this = this;
 //		var scopes = RET.scopes;
 		var scopes = RET;
@@ -526,13 +527,19 @@ onvifc.prototype.setScopes = function (input) {
 					port: this_wrapper.data.port,
 					username: this_wrapper.data.user,
 					password: this_wrapper.data.passwd
-				},function(err){
+				}, function (err) {
 //					this.setScopes(scopes_obj, function(stream){
-					this.setScopes(scopes_arr, function(stream){
+					this.setScopes(scopes_arr, function (scopes) {
 						if (!err) {
-							input.onDone(stream);
+							input.onDone(scopes);
 						} else {
-							local_obj_this.onFail("password error");
+							// local_obj_this.onFail("password error");
+							LOG.error("onvif setScopes Fail: ");
+							if (typeof(err.code) === "string") {
+								input.onFail(err.code);
+							} else {
+								input.onFail(err);
+							}
 						}
 			
 					});
@@ -544,6 +551,7 @@ onvifc.prototype.setScopes = function (input) {
 
 	this.getScopes(local_obj);
 };
+
 //顯示目前所有 ipcam 狀態
 onvifc.prototype.status = function (input) { 
 	LOG.warn('connector status');
@@ -555,7 +563,7 @@ onvifc.prototype.exit = function(input) {
 	this.disconnect(input);
 }
 
-onvifc.prototype.disconnect = function(input) {
+onvifc.prototype.disconnect = function (input) {
 	if (typeof(input) !== "undefined") {
 		this.checkCallbacks(input);
 		input.onDone("GG");
@@ -574,21 +582,20 @@ onvifc.prototype.getProfiles = function (input) {
 		function (err) {
 			if (err) {
 				LOG.error(err);
+				input.onFail(err);
 				return;
 			}
 			this.getProfiles(function (error, profiles) {
 				if (error) {
-					console.log(error);
+					LOG.error(error);
+					input.onFail(error);
 					return;
 				}
 				if (profiles) {
-					// console.log(profiles);
 					/*for (var i = 0; i < profiles.length; i++) {
 						console.log(profiles[i].$.token);
 					}*/
 					input.onDone({"Profiles": profiles});
-				} else {
-					input.onFail(error);
 				}
 			});
 		}
@@ -608,7 +615,7 @@ onvifc.prototype.getStreamUri = function(input) {
 						port: self.data.port,
 						username: self.data.user,
 						password: self.data.passwd
-					},function (err) {
+					}, function (err) {
 						if (err) {
 							LOG.error("err");
 							LOG.error(err);
@@ -617,7 +624,7 @@ onvifc.prototype.getStreamUri = function(input) {
 							{
 								"profileToken": profiles.Profiles[stop].$.token
 							},
-							function(err, stream) {
+							function (err, stream) {
 								var done = 0;
 								uri[stop] = stream.uri;
 								stop++;
