@@ -453,12 +453,21 @@ onvifc.prototype.setSystemDateAndTime = function (input) {
 			password: this_wrapper.data.passwd
 		}, function (err) {
 			this.setSystemDateAndTime(options, function (err, date) {
-				if (date) {
+				// console.log(err);
+				// console.log(date[0].fault);
+				// console.log(date[0].fault[0].reason[0].text[0]._); // what
+				if (!err) {
 					input.onDone(date);
 				} else {
 					LOG.error("onvif setSystemDateAndTime Fail: ");
 					if (typeof(err.code) === "string") {
 						input.onFail(err.code);
+					} else if (typeof(date) !== "undefined") {
+						try {
+							input.onFail(date[0].fault[0].reason[0].text[0]._);
+						} catch (err) {
+							input.onFail(date);
+						}
 					} else {
 						input.onFail(err);
 					}
