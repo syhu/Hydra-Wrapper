@@ -292,7 +292,7 @@ onvifc.prototype.getNTP = function (input) {
 				if (!err) {
 					input.onDone(ntp);
 				} else {
-					LOG.error("onvif getHostname Fail: ");
+					LOG.error("onvif getNTP Fail: ");
 					if (typeof(err.code) === "string") {
 						input.onFail(err.code);
 					} else {
@@ -312,29 +312,35 @@ onvifc.prototype.setNTP = function (input) {
 	options.fromDHCP = input.fromDHCP;
 	options.type = input.NTPtype;
 	
-	if (input.DNSname !== undefined) {
-		options.DNSname = input.DNSname;
+	if (typeof(input.DNSname) === "string") {
+		options.dnsName = input.DNSname;
 	}
 
-	if (input.IPv4Address !== undefined) {
-		options.IPv4Address = input.IPv4Address;
+	if (typeof(input.IPv4Address) === "string") {
+		options.ipv4Address = input.IPv4Address;
 	}
 
-	if (input.IPv6Address !== undefined) {
-		options.IPv6Address = input.IPv6Address;
+	if (typeof(input.IPv6Address) === "string") {
+		options.ipv6Address = input.IPv6Address;
 	}
+
 	new Cam(
 		{
 			hostname: this_wrapper.data.host,
 			port: this_wrapper.data.port,
 			username: this_wrapper.data.user,
 			password: this_wrapper.data.passwd
-		},function(err){
-			this.setNTP(options, function(err, stream){
+		}, function (err) {
+			this.setNTP(options, function (err, ntp) {
 				if (!err) {
-					input.onDone(stream);
+					input.onDone(ntp);
 				} else {
-					input.onFail("password error");
+					LOG.error("onvif setNTP Fail: ");
+					if (typeof(err.code) === "string") {
+						input.onFail(err.code);
+					} else {
+						input.onFail(err);
+					}
 				}
 			
 			});
