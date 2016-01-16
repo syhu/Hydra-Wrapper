@@ -233,10 +233,10 @@ onvifc.prototype.getScopes = function (input) {
 			port: this_wrapper.data.port,
 			username: this_wrapper.data.user,
 			password: this_wrapper.data.passwd
-		},function(err){
-			this.getScopes(function(err, stream){
-				if (stream) {
-					input.onDone(stream);
+		},function (err) {
+			this.getScopes(function (err, scopes) {
+				if (scopes) {
+					input.onDone(scopes);
 				} else {
 					LOG.error("onvif getScopes Fail: ");
 					LOG.error(err.code);
@@ -261,12 +261,22 @@ onvifc.prototype.getHostname = function (input) {
 			port: this_wrapper.data.port,
 			username: this_wrapper.data.user,
 			password: this_wrapper.data.passwd
-		},function(err){
-			this.getHostname(function(err, stream){
-				if (stream) {
-					input.onDone(stream);
+		},function (err) {
+			this.getHostname(function (err, hostname) {
+				if (hostname) {
+					input.onDone(hostname);
 				} else {
-					input.onFail("password error");
+					LOG.error("onvif getHostname Fail: ");
+					for (var key in err) {
+						LOG.error(key);
+						LOG.error(err[key]);
+					}
+					
+					if (typeof(err.code) === "string") {
+						input.onFail(err.code);
+					} else {
+						input.onFail(err);
+					}
 				}
 			
 			});
