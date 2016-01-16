@@ -356,12 +356,17 @@ onvifc.prototype.getSystemDateAndTime = function (input) {
 			port: this_wrapper.data.port,
 			username: this_wrapper.data.user,
 			password: this_wrapper.data.passwd
-		},function(err){
-			this.getSystemDateAndTime(function(err, stream){
-				if (stream) {
-					input.onDone(stream);
+		}, function (err) {
+			this.getSystemDateAndTime(function (err, date) {
+				if (date) {
+					input.onDone(date);
 				} else {
-					input.onFail("password error");
+					LOG.error("onvif getSystemDateAndTime Fail: ");
+					if (typeof(err.code) === "string") {
+						input.onFail(err.code);
+					} else {
+						input.onFail(err);
+					}
 				}
 			
 			});
@@ -446,12 +451,17 @@ onvifc.prototype.setSystemDateAndTime = function (input) {
 			port: this_wrapper.data.port,
 			username: this_wrapper.data.user,
 			password: this_wrapper.data.passwd
-		},function(err){
-			this.setSystemDateAndTime(options, function(err, stream){
-				if (stream) {
-					input.onDone(stream);
+		}, function (err) {
+			this.setSystemDateAndTime(options, function (err, date) {
+				if (date) {
+					input.onDone(date);
 				} else {
-					input.onFail("password error"); // ??
+					LOG.error("onvif setSystemDateAndTime Fail: ");
+					if (typeof(err.code) === "string") {
+						input.onFail(err.code);
+					} else {
+						input.onFail(err);
+					}
 				}
 			
 			});
