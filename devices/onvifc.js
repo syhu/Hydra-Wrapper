@@ -486,7 +486,6 @@ onvifc.prototype.setScopes = function (input) {
 	};
 
 	local_obj.onDone = function (RET) {
-		console.log(RET);
 		var local_obj_this = this;
 //		var scopes = RET.scopes;
 		var scopes = RET;
