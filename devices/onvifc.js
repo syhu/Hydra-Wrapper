@@ -36,6 +36,7 @@ var Cam = require('onvif').Cam;
 var discovery = require('onvif').Discovery;
 var http = require('http');
 var onvif = require('onvif');
+var moment = require("moment");
 //~ var child;
 
 //var obj = {};
@@ -65,7 +66,11 @@ onvifc.prototype.checkCallbacks = function (input) {
 			input.onFail = input.onError;
 		}
 	} else {
-		LOG.error("");
+		LOG.error("input undefined");
+		LOG.error("input.onDone = console.log");
+		LOG.error("input.onFail = console.log");
+		input.onDone = console.log;
+		input.onFail = console.log;
 	}
 }
 
@@ -228,12 +233,17 @@ onvifc.prototype.getScopes = function (input) {
 			port: this_wrapper.data.port,
 			username: this_wrapper.data.user,
 			password: this_wrapper.data.passwd
-		},function(err){
-			this.getScopes(function(err, stream){
-				if (stream) {
-					input.onDone(stream);
+		},function (err) {
+			this.getScopes(function (err, scopes) {
+				if (scopes) {
+					input.onDone(scopes);
 				} else {
-					input.onFail("password error");
+					LOG.error("onvif getScopes Fail: ");
+					if (typeof(err.code) === "string") {
+						input.onFail(err.code);
+					} else {
+						input.onFail(err);
+					}
 				}
 			
 			});
@@ -250,12 +260,17 @@ onvifc.prototype.getHostname = function (input) {
 			port: this_wrapper.data.port,
 			username: this_wrapper.data.user,
 			password: this_wrapper.data.passwd
-		},function(err){
-			this.getHostname(function(err, stream){
-				if (stream) {
-					input.onDone(stream);
+		}, function (err) {
+			this.getHostname(function (err, hostname) {
+				if (hostname) {
+					input.onDone(hostname);
 				} else {
-					input.onFail("password error");
+					LOG.error("onvif getHostname Fail: ");
+					if (typeof(err.code) === "string") {
+						input.onFail(err.code);
+					} else {
+						input.onFail(err);
+					}
 				}
 			
 			});
@@ -272,12 +287,17 @@ onvifc.prototype.getNTP = function (input) {
 			port: this_wrapper.data.port,
 			username: this_wrapper.data.user,
 			password: this_wrapper.data.passwd
-		},function(err){
-			this.getNTP(function(err, stream){
+		}, function (err) {
+			this.getNTP(function (err, ntp) {
 				if (!err) {
-					input.onDone(stream);
+					input.onDone(ntp);
 				} else {
-					input.onFail("password error");
+					LOG.error("onvif getNTP Fail: ");
+					if (typeof(err.code) === "string") {
+						input.onFail(err.code);
+					} else {
+						input.onFail(err);
+					}
 				}
 			
 			});
@@ -292,29 +312,35 @@ onvifc.prototype.setNTP = function (input) {
 	options.fromDHCP = input.fromDHCP;
 	options.type = input.NTPtype;
 	
-	if (input.DNSname !== undefined) {
-		options.DNSname = input.DNSname;
+	if (typeof(input.DNSname) === "string") {
+		options.dnsName = input.DNSname;
 	}
 
-	if (input.IPv4Address !== undefined) {
-		options.IPv4Address = input.IPv4Address;
+	if (typeof(input.IPv4Address) === "string") {
+		options.ipv4Address = input.IPv4Address;
 	}
 
-	if (input.IPv6Address !== undefined) {
-		options.IPv6Address = input.IPv6Address;
+	if (typeof(input.IPv6Address) === "string") {
+		options.ipv6Address = input.IPv6Address;
 	}
+
 	new Cam(
 		{
 			hostname: this_wrapper.data.host,
 			port: this_wrapper.data.port,
 			username: this_wrapper.data.user,
 			password: this_wrapper.data.passwd
-		},function(err){
-			this.setNTP(options, function(err, stream){
+		}, function (err) {
+			this.setNTP(options, function (err, ntp) {
 				if (!err) {
-					input.onDone(stream);
+					input.onDone(ntp);
 				} else {
-					input.onFail("password error");
+					LOG.error("onvif setNTP Fail: ");
+					if (typeof(err.code) === "string") {
+						input.onFail(err.code);
+					} else {
+						input.onFail(err);
+					}
 				}
 			
 			});
@@ -330,12 +356,17 @@ onvifc.prototype.getSystemDateAndTime = function (input) {
 			port: this_wrapper.data.port,
 			username: this_wrapper.data.user,
 			password: this_wrapper.data.passwd
-		},function(err){
-			this.getSystemDateAndTime(function(err, stream){
-				if (stream) {
-					input.onDone(stream);
+		}, function (err) {
+			this.getSystemDateAndTime(function (err, date) {
+				if (date) {
+					input.onDone(date);
 				} else {
-					input.onFail("password error");
+					LOG.error("onvif getSystemDateAndTime Fail: ");
+					if (typeof(err.code) === "string") {
+						input.onFail(err.code);
+					} else {
+						input.onFail(err);
+					}
 				}
 			
 			});
@@ -345,18 +376,73 @@ onvifc.prototype.getSystemDateAndTime = function (input) {
 };
 
 onvifc.prototype.setSystemDateAndTime = function (input) {
-	console.log("onvif input: ");
-	console.log(input);
 	var options = {};
 	options.dateTimeType = input.DateTimeType;
 	options.daylightSavings = input.DaylightSavings;
 	options.timezone = input.TimeZone;
-	options.year = input.Year;
+
+/*	options.year = input.Year;
 	options.month = input.Month;
 	options.day = input.Day;
 	options.hour = input.Hour;
 	options.minute = input.Minute;
-	options.second = input.Second;
+	options.second = input.Second;*/
+	var time = {};
+	var check = new moment({
+		"year": input.Year,
+		"month": input.Month,
+		"day": input.Day,
+	});
+
+	if (input.Second >= 0 && input.Second < 60) {
+		time.sec = input.Second;
+	} else {
+		input.onFail("second [0 - 59].");
+		return;
+	}
+	if (input.Minute >=0 && input.Minute < 60) {
+		time.min = input.Minute;
+	} else {
+		input.onFail("minute [0 - 59].");
+		return;
+	}
+	if (input.Hour >= 0 && input.Hour < 24) {
+		time.hour = input.Hour;
+	} else {
+		input.onFail("hour [0 - 23].");
+		return;
+	}
+
+	if (input.Year >= 1900) {
+		time.year = input.Year;
+	} else {
+		input.onFail("year [must greater than 1900].");
+		return;
+	}
+	if (input.Month > 0 && input.Month < 13) {
+		time.mon = input.Month - 1;
+		// moment use 0 - 11
+	} else {
+		input.onFail("Month [1 - 12].");
+		return;
+	}
+	if (parseInt(input.Day) > 0 && parseInt(input.Day) <= parseInt(check.endOf("month")._d.toString().split(" ")[2])) {
+		// console.log(check.date());
+		time.day = input.Day;
+		check.date(input.Day);
+	} else {
+		console.log(check);
+		input.onFail("day [1 - " + check.endOf("month")._d.toString().split(" ")[2] + "] (Year: " + check.year() + ", Month: "+ (check.month() + 1) + ")");
+		return;
+	}
+	// time_settings.data.wday = check.day(); // sunday: 0, Saturday: 6
+	// time_settings.data.yday = check.dayOfYear();
+
+	// self.dvr_connector.set_sys_time(time_settings);
+
+
+//	options.dateTime = moment.utc([time.year, time.mon, time.day, time.hour, time.min, time.sec, 0 /*millisecond*/]).valueOf();
+	options.dateTime = new Date(time.year, time.mon, time.day, time.hour, time.min, time.sec, 0 /*millisecond*/);
 
 	var this_wrapper = this;
 	new Cam(
@@ -365,12 +451,26 @@ onvifc.prototype.setSystemDateAndTime = function (input) {
 			port: this_wrapper.data.port,
 			username: this_wrapper.data.user,
 			password: this_wrapper.data.passwd
-		},function(err){
-			this.setSystemDateAndTime(options, function(err, stream){
-				if (stream) {
-					input.onDone(stream);
+		}, function (err) {
+			this.setSystemDateAndTime(options, function (err, date) {
+				// console.log(err);
+				// console.log(date[0].fault);
+				// console.log(date[0].fault[0].reason[0].text[0]._); // what ._.
+				if (!err) {
+					input.onDone(date);
 				} else {
-					input.onFail("password error"); // ??
+					LOG.error("onvif setSystemDateAndTime Fail: ");
+					if (typeof(err.code) === "string") {
+						input.onFail(err.code);
+					} else if (typeof(date) !== "undefined") {
+						try {
+							input.onFail(date[0].fault[0].reason[0].text[0]._);
+						} catch (err) {
+							input.onFail(JSON.stringify(date)); // sorry ._.`
+						}
+					} else {
+						input.onFail(err);
+					}
 				}
 			
 			});
@@ -386,6 +486,7 @@ onvifc.prototype.setScopes = function (input) {
 	};
 
 	local_obj.onDone = function (RET) {
+		console.log(RET);
 		var local_obj_this = this;
 //		var scopes = RET.scopes;
 		var scopes = RET;
@@ -426,13 +527,19 @@ onvifc.prototype.setScopes = function (input) {
 					port: this_wrapper.data.port,
 					username: this_wrapper.data.user,
 					password: this_wrapper.data.passwd
-				},function(err){
+				}, function (err) {
 //					this.setScopes(scopes_obj, function(stream){
-					this.setScopes(scopes_arr, function(stream){
+					this.setScopes(scopes_arr, function (scopes) {
 						if (!err) {
-							input.onDone(stream);
+							input.onDone(scopes);
 						} else {
-							local_obj_this.onFail("password error");
+							// local_obj_this.onFail("password error");
+							LOG.error("onvif setScopes Fail: ");
+							if (typeof(err.code) === "string") {
+								input.onFail(err.code);
+							} else {
+								input.onFail(err);
+							}
 						}
 			
 					});
@@ -444,6 +551,7 @@ onvifc.prototype.setScopes = function (input) {
 
 	this.getScopes(local_obj);
 };
+
 //顯示目前所有 ipcam 狀態
 onvifc.prototype.status = function (input) { 
 	LOG.warn('connector status');
@@ -451,47 +559,99 @@ onvifc.prototype.status = function (input) {
 	input.onDone({status:this.data}); 
 };
 
-onvifc.prototype.exit = function(input){
+onvifc.prototype.exit = function(input) {
 	this.disconnect(input);
 }
 
-onvifc.prototype.disconnect = function(input){
-	this.checkCallbacks(input);
-	input.onDone("GG");
+onvifc.prototype.disconnect = function (input) {
+	if (typeof(input) !== "undefined") {
+		this.checkCallbacks(input);
+		input.onDone("GG");
+	}
 }
 
-onvifc.prototype.getStreamUri = function(input){
-	var this_wrapper = this;
-	//for error ip input
-	var options = {
-		host: this.data.host,
-		port: 80,
-		path: ''
-	};
-
+onvifc.prototype.getProfiles = function (input) {
+	var self = this;
 	new Cam(
 		{
-			hostname: this_wrapper.data.host,
-			port: this_wrapper.data.port,
-			username: this_wrapper.data.user,
-			password: this_wrapper.data.passwd
-		},function(err){
-			this.getStreamUri(function(err, stream){
-				if(stream) {
-					input.onDone({
-						"uristream" : stream
-					});
-				} else {
-					input.onFail("password error");
+			"hostname": self.data.host,
+			"port": self.data.port,
+			"username": self.data.user,
+			"password": self.data.passwd
+		},
+		function (err) {
+			if (err) {
+				LOG.error(err);
+				input.onFail(err);
+				return;
+			}
+			this.getProfiles(function (error, profiles) {
+				if (error) {
+					LOG.error(error);
+					input.onFail(error);
+					return;
+				}
+				if (profiles) {
+					/*for (var i = 0; i < profiles.length; i++) {
+						console.log(profiles[i].$.token);
+					}*/
+					input.onDone({"Profiles": profiles});
 				}
 			});
 		}
 	);
+}
+
+onvifc.prototype.getStreamUri = function(input) {
+	var self = this;
+	var uri = [];
+	var get_profiles_param = {
+		"onDone": function (profiles) {
+
+			var recursive_call = function (stop) {
+				new Cam(
+					{
+						hostname: self.data.host,
+						port: self.data.port,
+						username: self.data.user,
+						password: self.data.passwd
+					}, function (err) {
+						if (err) {
+							LOG.error("err");
+							LOG.error(err);
+						}
+						this.getStreamUri(
+							{
+								"profileToken": profiles.Profiles[stop].$.token
+							},
+							function (err, stream) {
+								var done = 0;
+								uri[stop] = stream.uri;
+								stop++;
+								if (stop == profiles.Profiles.length) {
+									input.onDone({
+										"uristream" : uri
+									});
+								} else {
+									recursive_call(stop);
+								}
+							}
+						);
+					}
+				);
+			}
+			recursive_call(0);
+		},
+		"onFail": input.onFail
+	};
+
+	this.getProfiles(get_profiles_param);
 	
 }
 
 onvifc.prototype.getDeviceInformation = function(input){
 	var this_wrapper = this;
+	var self = this;
 	var local_obj = {
 		onFail: input.onFail
 	};
@@ -517,8 +677,8 @@ onvifc.prototype.getDeviceInformation = function(input){
 			}
 		});
 		
-		console.log("scope_obj");
-		console.log(scopes_obj);
+		// console.log("scope_obj");
+		// console.log(scopes_obj);
 		new Cam(
 			{
 				hostname: this_wrapper.data.host,
@@ -526,33 +686,32 @@ onvifc.prototype.getDeviceInformation = function(input){
 				username: this_wrapper.data.user,
 				password: this_wrapper.data.passwd
 			},function(err){
-				this.getDeviceInformation(function(err, stream){
+				this.getDeviceInformation(function (err, stream) { /* stream ????? */
 					if(err) {
 						console.log(err);
-						input.onFail("password error");
+						input.onFail(err);
 					} else {
-						var Uri_stream;
-						var cam_this = this;
-						cam_this.getStreamUri(function(err, uri){
-							Uri_stream = uri;
-							if(typeof(stream) !== "undefined" && typeof(uri) !== "undefined" && typeof(scopes_obj !== "undefined")){
-								console.log(stream);
-								input.onDone({
-									"Name" : scopes_obj.name,
-									"Type" : scopes_obj.type,
-									"Location" : scopes_obj.location,
-									"Harware" : scopes_obj.hardware,
-									"Manufacturer" : stream.manufacturer,
-									"Model" : stream.model,
-									"Serial" : stream.serialNumber,
-									"Version" : stream.firmwareVersion,
-									"rtsp" : Uri_stream.uri
-								});
-							} else{
-								input.onFail({
-									"Error" : "NULL"
-								});
-							}
+
+						self.getStreamUri({
+							"onDone": function (uri) {
+								if(typeof(stream) !== "undefined" && typeof(uri) !== "undefined" && typeof(scopes_obj !== "undefined")){
+									console.log(stream);
+									input.onDone({
+										"Name" : scopes_obj.name,
+										"Type" : scopes_obj.type,
+										"Location" : scopes_obj.location,
+										"Harware" : scopes_obj.hardware,
+										"Manufacturer" : stream.manufacturer,
+										"Model" : stream.model,
+										"Serial" : stream.serialNumber,
+										"Version" : stream.firmwareVersion,
+										"rtsp" : uri.uristream
+									});
+								} else{
+									input.onFail(err);
+								}
+							},
+							"onFail": input.onFail
 						});
 					}
 				});
@@ -874,32 +1033,41 @@ onvifc.prototype.getVideoEncoderConfiguration = function (input) {
 			port: this_wrapper.data.port,
 			username: this_wrapper.data.user,
 			password: this_wrapper.data.passwd
-		},function(err){
-			this.getVideoEncoderConfigurations(function(err, stream){
-				if(!err) {
-					if (input.token) {
-						Object.keys(stream).forEach(function(key){
-							if(stream[key].$.token === input.token) {
-								input.onDone(stream[key]);
+		}, function (err) {
+			this.getVideoEncoderConfigurations(
+				function (err, stream) {
+					if(!err) {
+						if (input.token) {
+							try {
+								Object.keys(stream).forEach(
+									function (key) {
+										if (stream[key].$.token === input.token) {
+											input.onDone(stream[key]);
+										}
+									}
+								);
+							} catch (error) {
+								input.onFail(error);
 							}
-						});
+						} else {
+							input.onDone(stream[0]);
+						}
 					} else {
-						input.onDone(stream[0]);
+						input.onFail(err);
 					}
-				} else {
-					input.onFail(err);
 				}
-			});
+			);
 		}
 	);
 	
 };
 
-
+// FIXME: refactor needed
 onvifc.prototype.setVideoEncoderConfiguration = function (input) {
 	var this_wrapper = this, 
 		options = {},	//setVideoEncoderConfiguration connector settings parm 
 		local_obj = {};	//getVideoEncoderConfiguration wrapper input
+		channel = input.channel || 0; // default: first encoder
 
 	if (input.token) {
 		//for getVideoEncoderConfiguration
@@ -907,32 +1075,35 @@ onvifc.prototype.setVideoEncoderConfiguration = function (input) {
 	}
 
 	local_obj.onDone = function (RET) {
-		options.token = RET.$.token;	
-		options.name = input.name || RET.name; 	
-		options.useCount = input.useCount || RET.useCount;
-		options.encoding = input.encoding || RET.encoding;
-		options.width = input.width || RET.resolution.width;
-		options.height = input.height || RET.resolution.height;
-		options.quality = input.quality || RET.quality;
-		options.bitRate = input.bitRate || RET.rateControl.bitrateLimit;
-		options.frameRate = input.frameRate || RET.rateControl.frameRateLimit;
-		options.encodingInterval = input.encodingInterval || RET.rateControl.encodingInterval;
-		if (RET.hasOwnProperty('MPEG4')) {
-			if (RET.MPEG4.hasOwnProperty('govLength')) {
-				options.MPEG4govLength = RET.MPEG4.govLength;
+		options.token = RET[channel].$.token;
+		options.name = input.name || RET[channel].name;
+		options.useCount = input.useCount || RET[channel].useCount;
+		options.encoding = input.encoding || RET[channel].encoding;
+		/*options.width = input.width || RET[channel].resolution.width;
+		options.height = input.height || RET[channel].resolution.height;*/
+		options.resolution = {};
+		options.resolution.width = input.width || RET[channel].resolution.width;
+		options.resolution.height = input.height || RET[channel].resolution.height;
+		options.quality = input.quality || RET[channel].quality;
+		options.bitRate = input.bitRate || RET[channel].rateControl.bitrateLimit;
+		options.frameRate = input.frameRate || RET[channel].rateControl.frameRateLimit;
+		options.encodingInterval = input.encodingInterval || RET[channel].rateControl.encodingInterval;
+		if (RET[channel].hasOwnProperty('MPEG4')) {
+			if (RET[channel].MPEG4.hasOwnProperty('govLength')) {
+				options.MPEG4govLength = RET[channel].MPEG4.govLength;
 			}
-			if (RET.MPEG4.hasOwnProperty('mpeg4Profile')) {
-				options.MPEG4profile = RET.MPEG4.mpeg4Profile;
+			if (RET[channel].MPEG4.hasOwnProperty('mpeg4Profile')) {
+				options.MPEG4profile = RET[channel].MPEG4.mpeg4Profile;
 			}
 		}
-		options.H264govLength = input.govLength || RET.H264.govLength;
-		options.H264profile = input.profile || RET.H264.H264Profile;
-		options.multicastAddressType = RET.multicast.address.type;
-		options.multicastAddress = RET.multicast.address.IPv4Address;
-		options.multicastPort = RET.multicast.port;
-		options.multicastTTL = RET.multicast.TTL;
-		options.multicastAutoStart = RET.multicast.autoStart;
-		options.sessionTimeout = RET.sessionTimeout;
+		options.H264govLength = input.govLength || RET[channel].H264.govLength;
+		options.H264profile = input.profile || RET[channel].H264.H264Profile;
+		options.multicastAddressType = RET[channel].multicast.address.type;
+		options.multicastAddress = RET[channel].multicast.address.IPv4Address;
+		options.multicastPort = RET[channel].multicast.port;
+		options.multicastTTL = RET[channel].multicast.TTL;
+		options.multicastAutoStart = RET[channel].multicast.autoStart;
+		options.sessionTimeout = RET[channel].sessionTimeout;
 
 		new Cam(
 			{
@@ -940,18 +1111,28 @@ onvifc.prototype.setVideoEncoderConfiguration = function (input) {
 				port: this_wrapper.data.port,
 				username: this_wrapper.data.user,
 				password: this_wrapper.data.passwd
-			},function(err){
-				this.setVideoEncoderConfiguration(options, function(err, stream){
-					if(!err) {
-						Object.keys(stream).forEach(function(key){
-							if(stream[key].$.token === options.token) {
-								input.onDone(stream[key]);
+			},
+			function (err) {
+				if (err) {
+					LOG.error(err);
+					return;
+				}
+				this.setVideoEncoderConfiguration(
+					options,
+					function(err, stream) {
+						if (!err) {
+							if (typeof (stream) !== "undefined") {
+								if (typeof (stream.$) !== "undefined") {
+									if (stream.$.token === options.token) {
+										input.onDone(stream);
+									}
+								}
 							}
-						});
-					} else {
-						input.onFail(err);
+						} else {
+							input.onFail(err);
+						}
 					}
-				});
+				);
 			}
 		);
 		
@@ -959,8 +1140,44 @@ onvifc.prototype.setVideoEncoderConfiguration = function (input) {
 	
 	local_obj.onFail = input.onFail;
 
-	this.getVideoEncoderConfiguration(local_obj);
+	this.getVideoEncoderConfigurations(local_obj);
 };
+
+onvifc.prototype.setLowResolution = function (input) {
+	var self = this;
+	this.checkCallbacks(input);
+
+	input.channel = ((input.channel) ? 1 : 0);
+
+	var setLowRes = {
+		"onDone": input.onDone,
+		"onFail": input.onFail,
+		"channel": input.channel,
+		"width": 352,
+		"height": 240,
+		"frameRate": 10
+	};
+
+	this.setVideoEncoderConfiguration(setLowRes);
+}
+
+onvifc.prototype.setHighResolution = function (input) {
+	var self = this;
+	this.checkCallbacks(input);
+
+	input.channel = ((input.channel) ? 1 : 0);
+
+	var setHighRes = {
+		"onDone": input.onDone,
+		"onFail": input.onFail,
+		"channel": input.channel,
+		"width": 1920,
+		"height": 1080,
+		"frameRate": 30
+	};
+
+	this.setVideoEncoderConfiguration(setHighRes);
+}
 
 onvifc.prototype.c_version_setVideoEncoderConfiguration = function (input) {
 	var token, argv4, this_wrapper = this;
