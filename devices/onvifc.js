@@ -1104,6 +1104,11 @@ onvifc.prototype.setVideoEncoderConfiguration = function (input) {
 		options.multicastAutoStart = RET[channel].multicast.autoStart;
 		options.sessionTimeout = RET[channel].sessionTimeout;
 
+		// FIXME: other options?
+		if (input.width == RET[channel].resolution.width && input.height == RET[channel].resolution.height) {
+			return input.onDone(RET[channel]);
+		}
+
 		new Cam(
 			{
 				hostname: this_wrapper.data.host,
@@ -1170,8 +1175,10 @@ onvifc.prototype.setHighResolution = function (input) {
 		"onDone": input.onDone,
 		"onFail": input.onFail,
 		"channel": input.channel,
-		"width": 1920,
-		"height": 1080,
+		/*"width": 1920,
+		"height": 1080,*/
+		"width": 1280,
+		"height": 720,
 		"frameRate": 30
 	};
 
