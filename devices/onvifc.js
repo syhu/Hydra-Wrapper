@@ -1063,7 +1063,7 @@ onvifc.prototype.getVideoEncoderConfiguration = function (input) {
 
 // FIXME: refactor needed
 onvifc.prototype.setVideoEncoderConfiguration = function (input) {
-	var this_wrapper = this, 
+	var self = this, 
 		options = {},	//setVideoEncoderConfiguration connector settings parm 
 		local_obj = {};	//getVideoEncoderConfiguration wrapper input
 		channel = input.channel || 0; // default: first encoder
@@ -1106,15 +1106,18 @@ onvifc.prototype.setVideoEncoderConfiguration = function (input) {
 
 		// FIXME: other options?
 		if (input.width == RET[channel].resolution.width && input.height == RET[channel].resolution.height) {
-			return input.onDone(RET[channel]);
+			return input.onDone({
+				"Res": self.data.Res,
+				"data": RET[channel]
+			});
 		}
 
 		new Cam(
 			{
-				hostname: this_wrapper.data.host,
-				port: this_wrapper.data.port,
-				username: this_wrapper.data.user,
-				password: this_wrapper.data.passwd
+				hostname: self.data.host,
+				port: self.data.port,
+				username: self.data.user,
+				password: self.data.passwd
 			},
 			function (err) {
 				if (err) {
@@ -1128,7 +1131,10 @@ onvifc.prototype.setVideoEncoderConfiguration = function (input) {
 							if (typeof (stream) !== "undefined") {
 								if (typeof (stream.$) !== "undefined") {
 									if (stream.$.token === options.token) {
-										input.onDone(stream);
+										input.onDone({
+											"Res": self.data.Res,
+											"data": stream
+										});
 									}
 								}
 							}
@@ -1162,6 +1168,15 @@ onvifc.prototype.setLowResolution = function (input) {
 		"frameRate": 10
 	};
 
+	if (typeof(this.data.Res) === "undefined") {
+		this.data.Res = {};
+	}
+
+	this.data.Res.Low = {
+		"width": setLowRes.width,
+		"height": setLowRes.height
+	};
+
 	this.setVideoEncoderConfiguration(setLowRes);
 }
 
@@ -1180,6 +1195,15 @@ onvifc.prototype.setHighResolution = function (input) {
 		"width": 1280,
 		"height": 720,
 		"frameRate": 30
+	};
+
+	if (typeof(this.data.Res) === "undefined") {
+		this.data.Res = {};
+	}
+
+	this.data.Res.High = {
+		"width": setHighRes.width,
+		"height": setHighRes.height
 	};
 
 	this.setVideoEncoderConfiguration(setHighRes);
