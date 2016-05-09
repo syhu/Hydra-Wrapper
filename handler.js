@@ -8,7 +8,7 @@
 var l_handlers = exports.handlers = {};
 var l_checkers = exports.checkers = {};
 
-var wrapper = require('../wrapper.js');
+var wrapper = require('../');
 
 var person1;
 var person2;

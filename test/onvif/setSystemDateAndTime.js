@@ -46,7 +46,7 @@ test = function (input) {
 		self.wrapper.setSystemDateAndTime(getstream);
 	}
 
-	var wrapper = require("../../wrapper.js");
+	var wrapper = require("../../");
 	this.wrapper = new wrapper();
 	this.wrapper.setup(setup);
 

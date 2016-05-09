@@ -13,7 +13,7 @@ test = function (input) {
 		console.log(response);
 	}
 
-	var wrapper = require("../../wrapper.js");
+	var wrapper = require("../../");
 	this.wrapper = new wrapper();
 	console.log(this.wrapper.__proto__);
 }

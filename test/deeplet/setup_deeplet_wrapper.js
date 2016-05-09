@@ -30,7 +30,7 @@ test = function (input) {
 	}
 
 	console.log("require wrapper\n");
-	var wrapper = require("../../wrapper.js");
+	var wrapper = require("../../");
 	console.log("create wrapper\n");
 	this.wrapper = new wrapper();
 	console.log("setup wrapper\n");

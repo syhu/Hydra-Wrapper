@@ -1,0 +1,29 @@
+{
+  "name": "hydra-connector-wrapper",
+  "version": "1.0.0",
+  "description": "Wrapper module in Hydra. A single point entry when you want to connect something.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "node t/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/imonology/Hydra-Wrapper.git"
+  },
+  "keywords": [
+    "Hydra",
+    "Connector",
+    "Device",
+    "ONVIF",
+    "Deeplet"
+  ],
+  "author": "He-Jung Wu <sunnyworm@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/imonology/Hydra-Wrapper/issues"
+  },
+  "homepage": "https://github.com/imonology/Hydra-Wrapper#readme"
+}

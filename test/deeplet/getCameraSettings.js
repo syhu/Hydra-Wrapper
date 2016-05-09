@@ -37,7 +37,7 @@ test = function (input) {
 		self.wrapper.getCameraSettings(camera);
 	};
 
-	var wrapper = require("../../wrapper.js");
+	var wrapper = require("../../");
 	this.wrapper = new wrapper();
 	this.wrapper.setup(setup);
 

@@ -1,6 +1,6 @@
 /*
 	Usage:
-		var wrapper = require("wrapper.js");
+		var wrapper = require("path/to/this/module/");
 		var deeplet = {
 			"device_type": "deeplet",
 			"address": "163.22.32.59",

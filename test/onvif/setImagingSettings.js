@@ -42,7 +42,7 @@ test = function (input) {
 	setup.onDone = function (response) {
 	}
 
-	var wrapper = require("../../wrapper.js");
+	var wrapper = require("../../");
 	this.wrapper = new wrapper();
 	this.wrapper.setup(setup);
 	this.wrapper.setImagingSettings(getDevInfo);
