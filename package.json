@@ -13,6 +13,15 @@
     "type": "git",
     "url": "git+https://github.com/imonology/Hydra-Wrapper.git"
   },
+  "dependencies": {
+    "moment": "*",
+    "sys": "*",
+    "child_process": "*",
+    "onvif": "agsh/onvif",
+    "http": "*",
+    "http": "*",
+    "fs": "*"
+  },
   "keywords": [
     "Hydra",
     "Connector",
