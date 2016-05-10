@@ -16,7 +16,6 @@
   "dependencies": {
     "moment": "*",
     "sys": "*",
-    "child_process": "*",
     "onvif": "agsh/onvif",
     "http": "*",
     "http": "*",
