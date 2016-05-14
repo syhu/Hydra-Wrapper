@@ -30,7 +30,7 @@ if (typeof(LOG) === "undefined") {
 
 //var onDone;
 
-var sys = require('sys'); // http://nodejs.org/api.html#_child_processes
+var util = require('util'); // http://nodejs.org/api.html#_child_processes
 var exec = require('child_process').exec;
 var Cam = require('onvif').Cam;
 var discovery = require('onvif').Discovery;
@@ -1800,8 +1800,8 @@ onvifc.prototype.execute = function (operation, ip, argv4, onDone, onFail) {
 
 		} catch (err) {
 			LOG.warn('Wrong: ' + err + "\n\n" + err.message);
-			sys.print('stdout: ' + stdout);
-			sys.print('stderr: ' + stderr);
+			util.print('stdout: ' + stdout);
+			util.print('stderr: ' + stderr);
 			onFail({'error:': 'onvifc has error, please check! '});
 			return;
 		}
