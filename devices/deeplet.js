@@ -144,20 +144,20 @@ deeplet.prototype.setupConnector = function (input) {
 	}
 
 	// check connector path
-	if (typeof(global) === "undefined" || typeof(global.g_settings) === "undefined" || typeof(global.g_settings.path) === "undefined") {
+	if (!IC || !IC.Settings.Project.path) {
 		// local testing
-		LOG.warn("global.g_settings.path undefined");
+		LOG.warn("g_settings.path undefined");
 		var connector = require("../../../connector/dvr_deeplet/dvr_connector_OO.js");
 
-	} else if (typeof(global) !== "undefined" && typeof(global.g_settings) !== "undefined" && typeof(global.g_settings.path) === "undefined") {
+	} else if (IC && IC.Settings.Project && !IC.Settings.Project.path) {
 		// libPath undefined
 		var connector = require("../../connector/dvr_deeplet/dvr_connector_OO.js");
 
-	} else if (typeof(global) !== "undefined" && typeof(global.g_settings) !== "undefined" && typeof(global.g_settings.path) !== "undefined") {
-		if (typeof(global.g_settings.path.connector) === "undefined") {
-			var connector = require(global.g_settings.path.base + "/connector/dvr_deeplet/dvr_connector_OO.js")
+	} else if (IC && IC.Settings.Project && IC.Settings.Project.path) {
+		if (!IC.Settings.Project.path.connector) {
+			var connector = require(IC.Settings.Project.path.base + "/connector/dvr_deeplet/dvr_connector_OO.js")
 		} else {
-			var connector = require(global.g_settings.path.connector + "deeplet/dvr_connector_OO.js");
+			var connector = require(IC.Settings.Project.path.connector + "deeplet/dvr_connector_OO.js");
 		}
 	}
 
