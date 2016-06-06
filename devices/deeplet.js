@@ -1,6 +1,6 @@
 var moment = require("moment");
 
-/* IC method */
+/* logging method */
 if (typeof(LOG) === "undefined") {
 	var LOG = {};
 	if (typeof(LOG.warn) === "undefined") {
@@ -143,24 +143,26 @@ deeplet.prototype.setupConnector = function (input) {
 		}
 	}
 
+	// FIXME: settings should be passed in externally, avoid using SR.Settings here if possible
 	// check connector path
-	if (!IC || !IC.Settings.Project.path) {
+	if (!SR) {
 		// local testing
 		LOG.warn("g_settings.path undefined");
 		var connector = require("../../../connector/dvr_deeplet/dvr_connector_OO.js");
 
-	} else if (IC && IC.Settings.Project && !IC.Settings.Project.path) {
-		// libPath undefined
-		var connector = require("../../connector/dvr_deeplet/dvr_connector_OO.js");
-
-	} else if (IC && IC.Settings.Project && IC.Settings.Project.path) {
-		if (!IC.Settings.Project.path.connector) {
-			var connector = require(IC.Settings.Project.path.base + "/connector/dvr_deeplet/dvr_connector_OO.js")
+	} else if (SR.Settings.Project) {
+		if (!SR.Settings.Project.path) {
+			// libPath undefined
+			var connector = require("../../connector/dvr_deeplet/dvr_connector_OO.js");
 		} else {
-			var connector = require(IC.Settings.Project.path.connector + "deeplet/dvr_connector_OO.js");
+			if (!SR.Settings.Project.path.connector) {
+				var connector = require(SR.Settings.Project.path.base + "/connector/dvr_deeplet/dvr_connector_OO.js")
+			} else {
+				var connector = require(SR.Settings.Project.path.connector + "deeplet/dvr_connector_OO.js");
+			}			
 		}
-	}
-
+	} 
+	
 	// create connector
 	LOG.warn("create connector");
 	this.dvr_connector = new connector();
