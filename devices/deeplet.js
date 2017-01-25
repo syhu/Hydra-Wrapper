@@ -1,6 +1,6 @@
 var moment = require("moment");
 
-/* IC method */
+/* SR method */
 if (typeof(LOG) === "undefined") {
 	var LOG = {};
 	if (typeof(LOG.warn) === "undefined") {
@@ -144,20 +144,20 @@ deeplet.prototype.setupConnector = function (input) {
 	}
 
 	// check connector path
-	if (!IC || !IC.Settings.Project.path) {
+	if (!SR || !SR.Settings.Project.path) {
 		// local testing
 		LOG.warn("g_settings.path undefined");
 		var connector = require("../../../connector/dvr_deeplet/dvr_connector_OO.js");
 
-	} else if (IC && IC.Settings.Project && !IC.Settings.Project.path) {
+	} else if (SR && SR.Settings.Project && !SR.Settings.Project.path) {
 		// libPath undefined
 		var connector = require("../../connector/dvr_deeplet/dvr_connector_OO.js");
 
-	} else if (IC && IC.Settings.Project && IC.Settings.Project.path) {
-		if (!IC.Settings.Project.path.connector) {
-			var connector = require(IC.Settings.Project.path.base + "/connector/dvr_deeplet/dvr_connector_OO.js")
+	} else if (SR && SR.Settings.Project && SR.Settings.Project.path) {
+		if (!SR.Settings.Project.path.connector) {
+			var connector = require(SR.Settings.Project.path.base + "/connector/dvr_deeplet/dvr_connector_OO.js")
 		} else {
-			var connector = require(IC.Settings.Project.path.connector + "deeplet/dvr_connector_OO.js");
+			var connector = require(SR.Settings.Project.path.connector + "deeplet/dvr_connector_OO.js");
 		}
 	}
 
