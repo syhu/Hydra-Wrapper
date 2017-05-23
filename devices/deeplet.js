@@ -148,7 +148,7 @@ deeplet.prototype.setupConnector = function (input) {
 	if (!SR || !SR.Settings.Project.path) {
 		// local testing
 		LOG.warn("g_settings.path undefined");
-		var connector = require("../../../connector/dvr_deeplet/dvr_connector_OO.js");
+		var connector = require(SR.path.resolve(SR.Settings.FRONTIER_PATH, '..', 'lib', 'Hydra-Connector-DVR', 'dvr_connector_OO.js'));
 
 	} else if (SR.Settings.Project) {
 		if (!SR.Settings.Project.path) {
