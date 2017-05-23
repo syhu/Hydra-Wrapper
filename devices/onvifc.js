@@ -8,7 +8,7 @@ init 要加入判斷帳號/密碼是否正確
 	
 */
 
-/* IC method */
+/* logging methods */
 if (typeof(LOG) === "undefined") {
 	var LOG = {};
 	if (typeof(LOG.warn) === "undefined") {
